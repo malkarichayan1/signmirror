@@ -1,0 +1,26 @@
+.sign-prompt {
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.sign-image-placeholder {
+  font-size: 4rem;
+  margin-bottom: 0.75rem;
+  line-height: 1;
+}
+
+.sign-name {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #f0f0f0;
+  margin-bottom: 0.5rem;
+}
+
+.sign-description {
+  font-size: 0.9rem;
+  color: #888;
+  line-height: 1.5;
+}

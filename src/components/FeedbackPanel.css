@@ -1,0 +1,65 @@
+.feedback-panel {
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  min-height: 90px;
+  transition: border-color 0.2s;
+}
+
+.feedback-panel.pass  { border-color: #00e676; }
+.feedback-panel.fail  { border-color: #444; }
+.feedback-panel.waiting { border-color: #333; }
+
+.feedback-hint {
+  color: #555;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.feedback-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.feedback-label {
+  color: #888;
+  font-size: 0.85rem;
+}
+
+.feedback-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #f0f0f0;
+}
+
+.feedback-threshold {
+  color: #555;
+  font-size: 0.8rem;
+}
+
+.score-bar-track {
+  height: 6px;
+  background: #2a2a2a;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 0.75rem;
+}
+
+.score-bar-fill {
+  height: 100%;
+  background: #00e676;
+  border-radius: 3px;
+  transition: width 0.1s ease-out;
+}
+
+.feedback-status {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #aaa;
+}
+
+.feedback-panel.pass .feedback-status { color: #00e676; }

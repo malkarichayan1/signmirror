@@ -1,0 +1,47 @@
+.lesson-list {
+  padding: 1rem 0;
+}
+
+.lesson-list-heading {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 1rem;
+}
+
+.lesson-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.lesson-card {
+  background: #1a1a1a;
+  border: 1px solid #2a2a2a;
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.lesson-card:hover {
+  border-color: #00e676;
+  background: #1f1f1f;
+}
+
+.lesson-card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #f0f0f0;
+}
+
+.lesson-card-meta {
+  font-size: 0.85rem;
+  color: #666;
+}
