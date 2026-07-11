@@ -30,15 +30,42 @@
   gap: 0.4rem;
 }
 
-.lesson-card:hover {
+.lesson-card:hover:not(:disabled) {
   border-color: #00e676;
   background: #1f1f1f;
+}
+
+.lesson-card.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.lesson-card.completed {
+  border-color: #00e676;
+  background: #111;
+}
+
+.lesson-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
 }
 
 .lesson-card-title {
   font-size: 1.1rem;
   font-weight: 600;
   color: #f0f0f0;
+}
+
+.lesson-badge {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.lesson-badge.check {
+  color: #00e676;
+  font-weight: 700;
 }
 
 .lesson-card-meta {

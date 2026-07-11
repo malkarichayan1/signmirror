@@ -7,105 +7,138 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: system-ui, sans-serif;
-      background: #0f0f0f;
-      color: #f0f0f0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2rem;
-      gap: 1.5rem;
-      min-height: 100vh;
+      background: #0f0f0f; color: #f0f0f0;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 2rem; gap: 1.5rem; min-height: 100vh;
     }
     h1 { font-size: 1.4rem; color: #00e676; }
+
+    .mode-tabs { display: flex; gap: 0; border: 1px solid #2a2a2a; border-radius: 8px; overflow: hidden; }
+    .mode-tab {
+      background: #1a1a1a; color: #888; border: none;
+      padding: 0.5rem 1.5rem; font-size: 0.95rem; cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .mode-tab.active { background: #00e676; color: #000; font-weight: 700; }
+
     .preview {
-      position: relative;
-      width: 640px;
-      height: 480px;
-      transform: scaleX(-1); /* mirror display; captured data stays raw */
-      background: #111;
-      border-radius: 10px;
-      overflow: hidden;
+      position: relative; width: 640px; height: 480px;
+      transform: scaleX(-1); background: #111;
+      border-radius: 10px; overflow: hidden;
     }
     video, canvas {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
     }
     canvas { pointer-events: none; }
+
     .controls {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-      flex-wrap: wrap;
-      justify-content: center;
+      display: flex; gap: 1rem;
+      align-items: center; flex-wrap: wrap; justify-content: center;
     }
     input[type="text"] {
-      background: #1a1a1a;
-      border: 1px solid #333;
-      color: #f0f0f0;
-      padding: 0.6rem 1rem;
-      border-radius: 6px;
-      font-size: 1rem;
-      width: 200px;
+      background: #1a1a1a; border: 1px solid #333; color: #f0f0f0;
+      padding: 0.6rem 1rem; border-radius: 6px; font-size: 1rem; width: 200px;
     }
     button {
-      background: #00e676;
-      color: #0f0f0f;
-      border: none;
-      padding: 0.65rem 1.4rem;
-      border-radius: 6px;
-      font-size: 1rem;
-      font-weight: 700;
-      cursor: pointer;
+      background: #00e676; color: #0f0f0f; border: none;
+      padding: 0.65rem 1.4rem; border-radius: 6px; font-size: 1rem;
+      font-weight: 700; cursor: pointer; transition: opacity 0.15s;
     }
+    button:hover:not(:disabled) { opacity: 0.85; }
     button:disabled { background: #333; color: #666; cursor: default; }
+    button.secondary {
+      background: transparent; color: #00e676; border: 1px solid #00e676;
+    }
+    button.secondary:hover:not(:disabled) { background: rgba(0,230,118,0.1); }
+    button.danger {
+      background: transparent; color: #ff5252; border: 1px solid #ff5252;
+    }
+
     #status { font-size: 0.9rem; color: #888; min-height: 1.4em; text-align: center; }
     #status.ok  { color: #00e676; }
     #status.err { color: #ff5252; }
+    #status.rec { color: #ff5252; font-weight: 600; }
+
     .hint {
-      font-size: 0.85rem;
-      color: #555;
-      text-align: center;
-      max-width: 600px;
-      line-height: 1.6;
+      font-size: 0.85rem; color: #555; text-align: center;
+      max-width: 600px; line-height: 1.6;
     }
     code { background: #1a1a1a; padding: 0.1em 0.4em; border-radius: 4px; }
+
+    #motionPanel { display: none; flex-direction: column; align-items: center; gap: 1rem; }
+    #motionPanel.visible { display: flex; }
+
+    #countdownOverlay {
+      font-size: 6rem; font-weight: 900; color: #00e676;
+      line-height: 1; text-align: center;
+    }
+    .preview-area {
+      width: 640px; height: 480px; background: #111;
+      border-radius: 10px; border: 1px solid #2a2a2a;
+      position: relative; display: none; overflow: hidden;
+    }
+    .preview-area.visible { display: block; }
+    #previewCanvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .motion-meta { font-size: 0.85rem; color: #666; text-align: center; font-variant-numeric: tabular-nums; }
   </style>
 </head>
 <body>
   <h1>SignMirror — Reference Capture</h1>
 
-  <div class="preview">
+  <div class="mode-tabs">
+    <button class="mode-tab active" id="tabStatic" onclick="switchMode('static')">Static</button>
+    <button class="mode-tab"        id="tabMotion" onclick="switchMode('motion')">Motion</button>
+  </div>
+
+  <!-- Live preview (shared between modes) -->
+  <div class="preview" id="livePreview">
     <video id="video" autoplay playsinline muted></video>
     <canvas id="canvas"></canvas>
   </div>
 
-  <div class="controls">
-    <input id="signId"   type="text" placeholder="sign id (e.g. hello)"       />
-    <input id="signName" type="text" placeholder="display name (e.g. Hello)"  />
+  <!-- Static mode -->
+  <div class="controls" id="staticControls">
+    <input id="signId"   type="text" placeholder="sign id (e.g. hello)"      />
+    <input id="signName" type="text" placeholder="display name (e.g. Hello)" />
     <button id="captureBtn" disabled>Capture (Space)</button>
+  </div>
+
+  <!-- Motion mode -->
+  <div id="motionPanel">
+    <div class="controls">
+      <input id="mSignId"   type="text" placeholder="sign id (e.g. wave)"      />
+      <input id="mSignName" type="text" placeholder="display name (e.g. Wave)" />
+      <button id="recordBtn" disabled>Start Recording (R)</button>
+    </div>
+    <div id="countdownOverlay" style="display:none;"></div>
+    <div class="preview-area" id="previewArea">
+      <canvas id="previewCanvas"></canvas>
+    </div>
+    <div class="motion-meta" id="motionMeta"></div>
+    <div class="controls" id="acceptControls" style="display:none;">
+      <button id="acceptBtn">Accept &amp; Download</button>
+      <button class="danger" id="retakeBtn">Retake</button>
+    </div>
   </div>
 
   <div id="status">Loading MediaPipe…</div>
 
   <p class="hint">
-    Hold the sign steady, then press <strong>Space</strong> or click Capture.<br>
-    The JSON downloads automatically — place it in <code>src/data/signs/</code>
-    and add it to <code>src/data/lessons.js</code>.
+    <strong>Static:</strong> Hold the sign steady, press <strong>Space</strong> or Capture.<br>
+    <strong>Motion:</strong> Press <strong>R</strong> or Start Recording → 3-2-1 → perform sign → preview → Accept.<br>
+    Place downloaded JSON in <code>src/data/signs/</code>.
   </p>
 
   <script type="module">
-    // Coordinate convention: landmarks are captured in RAW (unmirrored) camera
-    // coordinates, exactly as MediaPipe outputs them. The display above is
-    // CSS-mirrored so it feels like a mirror, but the numbers in the JSON are
-    // raw. This matches the convention in src/lib/normalize.js and matcher.js.
+    // Coordinate convention: landmarks captured in RAW (unmirrored) camera coords,
+    // matching src/lib/normalize.js and matcher.js.
 
-    const WASM_CDN =
-      'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm';
-    const MODEL_URL =
-      'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task';
+    const WASM_CDN  = 'https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm';
+    const MODEL_URL = 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task';
+
+    const MOTION_FPS        = 15;
+    const MOTION_MAX_FRAMES = 60;   // 4 s at 15 fps
+    const TRIM_EPSILON      = 0.03;
 
     const CONNECTIONS = [
       [0,1],[1,2],[2,3],[3,4],
@@ -116,36 +149,58 @@
       [5,9],[9,13],[13,17],
     ];
 
-    // Duplicated from src/lib/normalize.js to keep this file self-contained.
+    // Duplicated from src/lib/normalize.js — keeps this file self-contained.
     function normalizeLandmarks(landmarks) {
-      const wrist    = landmarks[0];
-      const midMcp   = landmarks[9];
-      const dx = midMcp.x - wrist.x;
-      const dy = midMcp.y - wrist.y;
+      const wrist = landmarks[0], midMcp = landmarks[9];
+      const dx = midMcp.x - wrist.x, dy = midMcp.y - wrist.y;
       const scale = Math.sqrt(dx * dx + dy * dy);
       if (scale < 1e-6) return null;
-      return landmarks.map((lm) => ({
+      return landmarks.map(lm => ({
         x: +((lm.x - wrist.x) / scale).toFixed(6),
         y: +((lm.y - wrist.y) / scale).toFixed(6),
         z: +((lm.z - wrist.z) / scale).toFixed(6),
       }));
     }
 
-    const video  = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const status = document.getElementById('status');
-    const btn    = document.getElementById('captureBtn');
-    const ctx    = canvas.getContext('2d');
-
-    let handLandmarker  = null;
-    let lastVideoTime   = -1;
-    let latestLandmarks = null;
-
-    function setStatus(msg, cls) {
-      status.textContent = msg;
-      status.className   = cls || '';
+    function trimStationaryFrames(frames) {
+      if (frames.length < 2) return frames;
+      function movement(a, b) {
+        let s = 0;
+        for (let i = 0; i < a.length; i++) {
+          const dx = a[i].x - b[i].x, dy = a[i].y - b[i].y, dz = a[i].z - b[i].z;
+          s += Math.sqrt(dx*dx + dy*dy + dz*dz);
+        }
+        return s / a.length;
+      }
+      let start = 0;
+      while (start < frames.length - 1 && movement(frames[start], frames[start+1]) < TRIM_EPSILON) start++;
+      let end = frames.length - 1;
+      while (end > start + 1 && movement(frames[end-1], frames[end]) < TRIM_EPSILON) end--;
+      return frames.slice(start, end + 1);
     }
 
+    // ── DOM elements
+    const video      = document.getElementById('video');
+    const canvas     = document.getElementById('canvas');
+    const status     = document.getElementById('status');
+    const captureBtn = document.getElementById('captureBtn');
+    const recordBtn  = document.getElementById('recordBtn');
+    const ctx        = canvas.getContext('2d');
+
+    let handLandmarker = null, lastVideoTime = -1, latestLandmarks = null;
+    let activeMode     = 'static';
+
+    // Motion state
+    let recording       = false;
+    let capturedFrames  = [];
+    let lastCapture     = 0;
+    let countdownTimer  = null;
+    let maxFrameTimer   = null;
+    let previewRaf      = null;
+
+    function setStatus(msg, cls) { status.textContent = msg; status.className = cls || ''; }
+
+    // ── Init
     async function init() {
       try {
         const { HandLandmarker, FilesetResolver } = await import(
@@ -154,43 +209,56 @@
         const vision = await FilesetResolver.forVisionTasks(WASM_CDN);
         handLandmarker = await HandLandmarker.createFromOptions(vision, {
           baseOptions: { modelAssetPath: MODEL_URL, delegate: 'GPU' },
-          runningMode: 'VIDEO',
-          numHands: 1,
+          runningMode: 'VIDEO', numHands: 1,
         });
-
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
         video.srcObject = stream;
         await video.play();
-
-        btn.disabled = false;
-        setStatus('Ready — hold a sign and press Space or Capture.', 'ok');
+        captureBtn.disabled = false;
+        recordBtn.disabled  = false;
+        setStatus('Ready.', 'ok');
         requestAnimationFrame(detect);
       } catch (err) {
         setStatus('Error: ' + err.message, 'err');
-        console.error(err);
       }
     }
 
-    function detect() {
+    function detect(now) {
       if (video.readyState >= 2 && video.currentTime !== lastVideoTime) {
         lastVideoTime = video.currentTime;
         const results = handLandmarker.detectForVideo(video, performance.now());
         latestLandmarks = results.landmarks[0] || null;
-        draw(latestLandmarks);
+        drawLive(latestLandmarks);
+
+        if (recording) {
+          if (!latestLandmarks) {
+            // Hand lost — abort
+            clearTimeout(maxFrameTimer);
+            recording = false;
+            capturedFrames = [];
+            document.getElementById('countdownOverlay').style.display = 'none';
+            recordBtn.disabled = false;
+            setStatus('Hand left the frame — try again.', 'err');
+          } else if (now - lastCapture >= 1000 / MOTION_FPS) {
+            const norm = normalizeLandmarks(latestLandmarks);
+            if (norm) capturedFrames.push(norm);
+            lastCapture = now;
+            const elapsed = (capturedFrames.length / MOTION_FPS).toFixed(1);
+            setStatus(`Recording… ${elapsed}s (${capturedFrames.length} frames)`, 'rec');
+            if (capturedFrames.length >= MOTION_MAX_FRAMES) stopRecording();
+          }
+        }
       }
       requestAnimationFrame(detect);
     }
 
-    function draw(lms) {
-      const w = video.videoWidth;
-      const h = video.videoHeight;
+    function drawLive(lms) {
+      const w = video.videoWidth, h = video.videoHeight;
       if (canvas.width !== w) canvas.width = w;
       if (canvas.height !== h) canvas.height = h;
       ctx.clearRect(0, 0, w, h);
       if (!lms) return;
-
-      ctx.strokeStyle = '#00e676';
-      ctx.lineWidth   = 2;
+      ctx.strokeStyle = '#00e676'; ctx.lineWidth = 2;
       for (const [a, b] of CONNECTIONS) {
         ctx.beginPath();
         ctx.moveTo(lms[a].x * w, lms[a].y * h);
@@ -199,43 +267,179 @@
       }
       ctx.fillStyle = '#fff';
       for (const lm of lms) {
-        ctx.beginPath();
-        ctx.arc(lm.x * w, lm.y * h, 4, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.beginPath(); ctx.arc(lm.x * w, lm.y * h, 4, 0, Math.PI * 2); ctx.fill();
       }
     }
 
-    function capture() {
-      if (!latestLandmarks) {
-        setStatus('No hand detected — move closer to the camera.', 'err');
-        return;
-      }
+    // ── Mode switching
+    window.switchMode = function(mode) {
+      activeMode = mode;
+      document.getElementById('tabStatic').classList.toggle('active', mode === 'static');
+      document.getElementById('tabMotion').classList.toggle('active', mode === 'motion');
+      document.getElementById('staticControls').style.display = mode === 'static' ? '' : 'none';
+      document.getElementById('motionPanel').classList.toggle('visible', mode === 'motion');
+    };
+
+    // ── Static capture
+    function captureStatic() {
+      if (!latestLandmarks) { setStatus('No hand detected.', 'err'); return; }
       const id   = document.getElementById('signId').value.trim()   || 'unnamed';
       const name = document.getElementById('signName').value.trim() || id;
+      const norm = normalizeLandmarks(latestLandmarks);
+      if (!norm) { setStatus('Normalization failed.', 'err'); return; }
+      downloadJSON({ id, name, description: '', landmarks: norm }, id + '.json');
+      setStatus(`Captured "${name}" → ${id}.json`, 'ok');
+    }
 
-      const normalized = normalizeLandmarks(latestLandmarks);
-      if (!normalized) {
-        setStatus('Normalization failed — hand may be degenerate.', 'err');
+    captureBtn.addEventListener('click', captureStatic);
+
+    // ── Motion countdown
+    function startCountdown() {
+      if (!handLandmarker || recording) return;
+      capturedFrames = [];
+      recordBtn.disabled = true;
+      document.getElementById('previewArea').classList.remove('visible');
+      document.getElementById('acceptControls').style.display = 'none';
+      document.getElementById('motionMeta').textContent = '';
+      document.getElementById('livePreview').style.display = 'block';
+
+      let n = 3;
+      const overlay = document.getElementById('countdownOverlay');
+      overlay.style.display = 'block';
+      overlay.textContent   = n;
+
+      countdownTimer = setInterval(() => {
+        n--;
+        if (n > 0) {
+          overlay.textContent = n;
+        } else {
+          clearInterval(countdownTimer);
+          overlay.style.display = 'none';
+          startRecording();
+        }
+      }, 1000);
+    }
+
+    function startRecording() {
+      recording   = true;
+      lastCapture = 0;
+      capturedFrames = [];
+      maxFrameTimer = setTimeout(stopRecording, ((MOTION_MAX_FRAMES / MOTION_FPS) + 0.1) * 1000);
+    }
+
+    function stopRecording() {
+      if (!recording) return;
+      recording = false;
+      clearTimeout(maxFrameTimer);
+
+      if (capturedFrames.length < 3) {
+        setStatus('Too few frames captured — try again.', 'err');
+        recordBtn.disabled = false;
         return;
       }
 
-      const payload = { id, name, description: '', landmarks: normalized };
-      const blob = new Blob(
-        [JSON.stringify(payload, null, 2)],
-        { type: 'application/json' }
-      );
-      const a = document.createElement('a');
-      a.href     = URL.createObjectURL(blob);
-      a.download = id + '.json';
-      a.click();
-      URL.revokeObjectURL(a.href);
-      setStatus('Captured "' + name + '" -> ' + id + '.json downloaded.', 'ok');
+      const trimmed = trimStationaryFrames(capturedFrames);
+      capturedFrames = trimmed;
+      document.getElementById('motionMeta').textContent =
+        `${trimmed.length} frames @ ${MOTION_FPS} fps ≈ ${(trimmed.length / MOTION_FPS).toFixed(1)}s`;
+      setStatus('Preview playing — accept or retake.', 'ok');
+      showPreview(trimmed);
     }
 
-    btn.addEventListener('click', capture);
-    window.addEventListener('keydown', function(e) {
-      if (e.code === 'Space') { e.preventDefault(); capture(); }
+    function showPreview(frames) {
+      document.getElementById('livePreview').style.display  = 'none';
+      document.getElementById('previewArea').classList.add('visible');
+      document.getElementById('acceptControls').style.display = 'flex';
+
+      const pc  = document.getElementById('previewCanvas');
+      const pCtx = pc.getContext('2d');
+      const W = 640, H = 480;
+      pc.width = W; pc.height = H;
+
+      // Compute stable bounding box across all frames for consistent framing.
+      let mnX = Infinity, mxX = -Infinity, mnY = Infinity, mxY = -Infinity;
+      for (const frame of frames) {
+        for (const lm of frame) {
+          if (lm.x < mnX) mnX = lm.x; if (lm.x > mxX) mxX = lm.x;
+          if (lm.y < mnY) mnY = lm.y; if (lm.y > mxY) mxY = lm.y;
+        }
+      }
+      const padX = (mxX - mnX) * 0.15 || 0.2;
+      const padY = (mxY - mnY) * 0.15 || 0.2;
+      mnX -= padX; mxX += padX; mnY -= padY; mxY += padY;
+      const s = Math.min(W / (mxX - mnX), H / (mxY - mnY));
+      const ox = (W - (mxX - mnX) * s) / 2;
+      const oy = (H - (mxY - mnY) * s) / 2;
+      const px = x => ox + (x - mnX) * s;
+      const py = y => oy + (y - mnY) * s;
+
+      const interval = 1000 / MOTION_FPS;
+      let idx = 0, lastTime = 0;
+
+      if (previewRaf) cancelAnimationFrame(previewRaf);
+
+      function tick(now) {
+        if (now - lastTime >= interval) {
+          const lms = frames[idx];
+          pCtx.clearRect(0, 0, W, H);
+          pCtx.strokeStyle = '#00e676'; pCtx.lineWidth = 3;
+          for (const [a, b] of CONNECTIONS) {
+            pCtx.beginPath();
+            pCtx.moveTo(px(lms[a].x), py(lms[a].y));
+            pCtx.lineTo(px(lms[b].x), py(lms[b].y));
+            pCtx.stroke();
+          }
+          pCtx.fillStyle = '#fff';
+          for (const lm of lms) {
+            pCtx.beginPath(); pCtx.arc(px(lm.x), py(lm.y), 5, 0, Math.PI * 2); pCtx.fill();
+          }
+          idx = (idx + 1) % frames.length;
+          lastTime = now;
+        }
+        previewRaf = requestAnimationFrame(tick);
+      }
+      previewRaf = requestAnimationFrame(tick);
+    }
+
+    // ── Accept / retake
+    document.getElementById('acceptBtn').addEventListener('click', () => {
+      if (previewRaf) { cancelAnimationFrame(previewRaf); previewRaf = null; }
+      const id   = document.getElementById('mSignId').value.trim()   || 'unnamed';
+      const name = document.getElementById('mSignName').value.trim() || id;
+      downloadJSON({ id, name, description: '', type: 'motion', fps: MOTION_FPS, frames: capturedFrames }, id + '.json');
+      setStatus(`Downloaded "${name}" → ${id}.json`, 'ok');
     });
+
+    document.getElementById('retakeBtn').addEventListener('click', () => {
+      if (previewRaf) { cancelAnimationFrame(previewRaf); previewRaf = null; }
+      capturedFrames = [];
+      document.getElementById('previewArea').classList.remove('visible');
+      document.getElementById('acceptControls').style.display = 'none';
+      document.getElementById('livePreview').style.display    = 'block';
+      document.getElementById('motionMeta').textContent = '';
+      recordBtn.disabled = false;
+      setStatus('Ready to record again.', 'ok');
+    });
+
+    recordBtn.addEventListener('click', startCountdown);
+
+    // ── Keyboard shortcuts
+    window.addEventListener('keydown', e => {
+      if (e.code === 'Space' && activeMode === 'static') { e.preventDefault(); captureStatic(); }
+      if (e.code === 'KeyR'  && activeMode === 'motion' && !recording && !recordBtn.disabled) {
+        e.preventDefault(); startCountdown();
+      }
+    });
+
+    function downloadJSON(obj, filename) {
+      const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = filename; a.click();
+      URL.revokeObjectURL(a.href);
+    }
+
+    // Start with motion panel hidden.
+    document.getElementById('motionPanel').classList.remove('visible');
 
     init();
   </script>

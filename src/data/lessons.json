@@ -1,0 +1,20 @@
+[
+  {
+    "id": "getting-started",
+    "title": "Getting Started",
+    "signs": ["hello", "thankyou", "yes"],
+    "unlockedBy": null
+  },
+  {
+    "id": "alphabet-1",
+    "title": "Alphabet: A–E",
+    "signs": ["a", "b", "c", "d", "e"],
+    "unlockedBy": "getting-started"
+  },
+  {
+    "id": "alphabet-2",
+    "title": "Alphabet: F–J",
+    "signs": ["f", "g", "h", "i", "j"],
+    "unlockedBy": "alphabet-1"
+  }
+]
