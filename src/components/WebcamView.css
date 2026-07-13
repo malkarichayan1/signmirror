@@ -3,13 +3,15 @@
    the visual flip without any coordinate math. */
 .webcam-wrap {
   position: relative;
-  width: 640px;
-  height: 480px;
+  width: 100%;
+  max-width: 720px;
+  aspect-ratio: 4 / 3;
   transform: scaleX(-1);
-  background: #111;
-  border-radius: 10px;
+  background: #0a0f1e;
+  border-radius: var(--r-2xl);
   overflow: hidden;
-  flex-shrink: 0;
+  flex-shrink: 1;
+  box-shadow: var(--sh-2);
 }
 
 .webcam-video {

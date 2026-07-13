@@ -5,7 +5,14 @@ import FeedbackPanel from './FeedbackPanel.jsx';
 import SkeletonReplay from './SkeletonReplay.jsx';
 import { matchPose } from '../lib/matcher.js';
 import { trimStationaryFrames } from '../lib/sequenceMatcher.js';
+import Confetti from './Confetti.jsx';
 import { recordAttempt, markLessonComplete } from '../lib/progress.js';
+import {
+  recordSignResult,
+  awardBonusXp,
+  XP_PER_SIGN,
+  LESSON_BONUS_XP,
+} from '../lib/stats.js';
 import {
   HOLD_DURATION_MS,
   DTW_BAND_RATIO,
@@ -31,10 +38,10 @@ function HoldRing({ pct }) {
   const cy   = size / 2;
   return (
     <svg width={size} height={size} className="hold-ring" aria-hidden="true">
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#333" strokeWidth={sw} />
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--card-2)" strokeWidth={sw} />
       <circle
         cx={cx} cy={cy} r={r}
-        fill="none" stroke="#00e676" strokeWidth={sw}
+        fill="none" stroke="var(--emerald)" strokeWidth={sw}
         strokeDasharray={circ} strokeDashoffset={offset}
         strokeLinecap="round"
         transform={`rotate(-90 ${cx} ${cy})`}
@@ -46,11 +53,24 @@ function HoldRing({ pct }) {
 // ── Lesson complete screen ──────────────────────────────────────────────────
 
 function CompleteScreen({ lesson, signResults, onBack, onRetry }) {
+  const passedCount = lesson.signs.filter(s => signResults[s.id]?.passed).length;
+  const xpEarned = passedCount * XP_PER_SIGN + LESSON_BONUS_XP;
   return (
     <div className="complete-screen">
+      <Confetti />
       <div className="complete-badge">🎉</div>
-      <h2 className="complete-title">Lesson Complete!</h2>
+      <h2 className="complete-title">Lesson complete!</h2>
       <p className="complete-subtitle">{lesson.title}</p>
+      <div className="complete-stats">
+        <div className="complete-stat">
+          <b className="num">+{xpEarned}</b>
+          <span>XP earned</span>
+        </div>
+        <div className="complete-stat">
+          <b className="num">{passedCount}/{lesson.signs.length}</b>
+          <span>Signs passed</span>
+        </div>
+      </div>
       <ul className="complete-results">
         {lesson.signs.map(sign => {
           const r = signResults[sign.id] ?? { attempts: 0, passed: false, skipped: false };
@@ -172,7 +192,8 @@ export default function LessonRunner({ lesson, onComplete }) {
       next = rest;
     }
     if (next.length === 0) {
-      markLessonComplete(lesson.id);
+      if (!lesson.isPractice) markLessonComplete(lesson.id);
+      awardBonusXp(LESSON_BONUS_XP);
       setMode('complete');
     } else {
       setMode('attempting');
@@ -190,6 +211,7 @@ export default function LessonRunner({ lesson, onComplete }) {
     passedRef.current = true;
     const signId = currentSign.id;
     recordAttempt(lesson.id, signId, { passed: true });
+    recordSignResult({ passed: true, signName: currentSign.name });
     setSignResults(prev => ({
       ...prev,
       [signId]: {
@@ -204,6 +226,7 @@ export default function LessonRunner({ lesson, onComplete }) {
   function handleSkip() {
     const signId = currentSign.id;
     recordAttempt(lesson.id, signId, { skipped: true });
+    recordSignResult({ passed: false, signName: currentSign.name });
     setSignResults(prev => ({
       ...prev,
       [signId]: {
@@ -403,8 +426,19 @@ export default function LessonRunner({ lesson, onComplete }) {
   if (!currentSign) return null;
 
   return (
-    <div className="lesson-runner">
-      <WebcamView onLandmarks={handleLandmarks} />
+    <div className="lesson-runner-wrap">
+      <div
+        className="runner-progress"
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={totalSigns}
+        aria-valuenow={doneCount}
+        aria-label="Lesson progress"
+      >
+        <i style={{ width: `${(doneCount / totalSigns) * 100}%` }} />
+      </div>
+      <div className="lesson-runner">
+        <WebcamView onLandmarks={handleLandmarks} />
 
       <div className="runner-sidebar">
         <div className="sign-counter">
@@ -490,6 +524,7 @@ export default function LessonRunner({ lesson, onComplete }) {
             )}
           </>
         )}
+        </div>
       </div>
     </div>
   );

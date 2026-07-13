@@ -16,8 +16,8 @@ function drawHand(ctx, landmarkSets, w, h) {
   ctx.clearRect(0, 0, w, h);
   if (!landmarkSets || landmarkSets.length === 0) return;
   const lms = landmarkSets[0];
-  ctx.strokeStyle = '#00e676';
-  ctx.lineWidth = 2;
+  ctx.strokeStyle = '#22d3ee';
+  ctx.lineWidth = 2.5;
   for (const [a, b] of CONNECTIONS) {
     ctx.beginPath();
     ctx.moveTo(lms[a].x * w, lms[a].y * h);

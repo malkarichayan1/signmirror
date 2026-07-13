@@ -1,65 +1,77 @@
 .feedback-panel {
-  background: #1a1a1a;
-  border: 1px solid #2a2a2a;
-  border-radius: 10px;
-  padding: 1.25rem 1.5rem;
-  min-height: 90px;
-  transition: border-color 0.2s;
+  background: var(--card);
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-xl);
+  box-shadow: var(--sh-1);
+  padding: 18px 20px;
+  min-height: 96px;
+  transition: border-color var(--dur-base) var(--ease-out);
 }
 
-.feedback-panel.pass  { border-color: #00e676; }
-.feedback-panel.fail  { border-color: #444; }
-.feedback-panel.waiting { border-color: #333; }
+.feedback-panel.pass {
+  border-color: var(--emerald);
+  background: var(--emerald-soft);
+}
+
+.feedback-panel.fail {
+  border-color: var(--line);
+}
+
+.feedback-panel.waiting {
+  border-color: var(--line);
+  border-style: dashed;
+}
 
 .feedback-hint {
-  color: #555;
-  font-size: 0.95rem;
-  margin: 0;
+  color: var(--ink-3);
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .feedback-row {
   display: flex;
   align-items: baseline;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
+  gap: 8px;
+  margin-bottom: 10px;
 }
 
 .feedback-label {
-  color: #888;
-  font-size: 0.85rem;
+  color: var(--ink-3);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .feedback-value {
-  font-size: 1.4rem;
-  font-weight: 700;
+  font-size: 24px;
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
-  color: #f0f0f0;
-}
-
-.feedback-threshold {
-  color: #555;
-  font-size: 0.8rem;
+  color: var(--ink);
+  letter-spacing: -0.01em;
 }
 
 .score-bar-track {
-  height: 6px;
-  background: #2a2a2a;
-  border-radius: 3px;
+  height: 8px;
+  background: var(--card-2);
+  border-radius: 999px;
   overflow: hidden;
-  margin-bottom: 0.75rem;
+  margin-bottom: 10px;
 }
 
 .score-bar-fill {
   height: 100%;
-  background: #00e676;
-  border-radius: 3px;
-  transition: width 0.1s ease-out;
+  background: linear-gradient(90deg, var(--amber), var(--emerald));
+  border-radius: 999px;
+  transition: width 0.12s ease-out;
 }
 
 .feedback-status {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #aaa;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-2);
 }
 
-.feedback-panel.pass .feedback-status { color: #00e676; }
+.feedback-panel.pass .feedback-status {
+  color: var(--emerald-deep);
+}

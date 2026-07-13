@@ -52,19 +52,24 @@ export default function SkeletonReplay({ frames, fps = 15, size = 200 }) {
     let frameIdx = 0;
     let lastTime = 0;
 
+    // Read theme tokens so the replay matches light/dark mode.
+    const styles = getComputedStyle(canvas);
+    const boneColor  = styles.getPropertyValue('--skeleton-bone').trim() || '#4f46e5';
+    const jointColor = styles.getPropertyValue('--skeleton-joint').trim() || '#22c55e';
+
     function drawFrame(lms) {
       ctx.clearRect(0, 0, size, size);
       const pts = lms.map(toCanvas);
 
-      ctx.strokeStyle = '#00e676';
-      ctx.lineWidth   = 2;
+      ctx.strokeStyle = boneColor;
+      ctx.lineWidth   = 2.5;
       for (const [a, b] of CONNECTIONS) {
         ctx.beginPath();
         ctx.moveTo(pts[a].x, pts[a].y);
         ctx.lineTo(pts[b].x, pts[b].y);
         ctx.stroke();
       }
-      ctx.fillStyle = '#ffffff';
+      ctx.fillStyle = jointColor;
       for (const pt of pts) {
         ctx.beginPath();
         ctx.arc(pt.x, pt.y, 3, 0, Math.PI * 2);

@@ -16,15 +16,16 @@ export default function FeedbackPanel({ distance, pass }) {
       ) : (
         <>
           <div className="feedback-row">
-            <span className="feedback-label">Distance</span>
-            <span className="feedback-value">{distance.toFixed(4)}</span>
-            <span className="feedback-threshold">/ {MATCH_THRESHOLD}</span>
+            <span className="feedback-label">Match</span>
+            <span className="feedback-value" title={`distance ${distance.toFixed(4)}`}>
+              {Math.round(barPct)}%
+            </span>
           </div>
           <div className="score-bar-track">
             <div className="score-bar-fill" style={{ width: `${barPct}%` }} />
           </div>
           <div className="feedback-status">
-            {pass ? '✓ Match!' : 'Keep adjusting…'}
+            {pass ? '✓ Great! Hold it there…' : 'Keep adjusting — you’re close'}
           </div>
         </>
       )}

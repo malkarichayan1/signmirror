@@ -64,6 +64,24 @@ export function isLessonUnlocked(lesson, progress) {
   return Boolean(progress[lesson.unlockedBy]?.completed);
 }
 
+// Signs the user attempted or skipped but never passed, across all lessons.
+export function getMistakeSigns(lessons, progress) {
+  const seen = new Set();
+  const mistakes = [];
+  for (const lesson of lessons) {
+    const signsProg = progress[lesson.id]?.signs ?? {};
+    for (const sign of lesson.signs) {
+      const record = signsProg[sign.id];
+      if (!record || record.passed || seen.has(sign.id)) continue;
+      if (record.skipped || record.attempts > 0) {
+        seen.add(sign.id);
+        mistakes.push(sign);
+      }
+    }
+  }
+  return mistakes;
+}
+
 export function exportProgress() {
   return JSON.stringify(loadProgress(), null, 2);
 }

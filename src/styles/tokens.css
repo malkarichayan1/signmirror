@@ -1,0 +1,112 @@
+/* ── SignMirror design tokens ─────────────────────────────────────────────
+   Light theme is the default. Dark theme activates via [data-theme="dark"]
+   on <html> (set from Profile settings) and follows the OS preference on
+   first run. All component styles must read these variables — never
+   hardcode palette values. */
+
+:root {
+  /* Brand */
+  --indigo: #4f46e5;
+  --indigo-deep: #4338ca;
+  --indigo-soft: #eef2ff;
+  --indigo-ghost: #e0e7ff;
+  --emerald: #22c55e;
+  --emerald-deep: #16a34a;
+  --emerald-soft: #ecfdf5;
+  --cyan: #06b6d4;
+  --cyan-deep: #0891b2;
+  --cyan-soft: #ecfeff;
+  --amber: #f59e0b;
+  --amber-soft: #fffbeb;
+  --rose: #f43f5e;
+  --rose-soft: #fff1f2;
+
+  /* Surfaces & ink */
+  --ground: #f8fafc;
+  --card: #ffffff;
+  --card-2: #f1f5f9;
+  --ink: #0f172a;
+  --ink-2: #475569;
+  --ink-3: #94a3b8;
+  --line: #e2e8f0;
+  --on-accent: #ffffff;
+
+  /* Skeleton-drawing colors (read by canvas components) */
+  --skeleton-bone: #4f46e5;
+  --skeleton-joint: #22c55e;
+
+  /* Elevation */
+  --sh-1: 0 1px 2px rgba(15, 23, 42, 0.05), 0 4px 14px rgba(15, 23, 42, 0.07);
+  --sh-2: 0 4px 10px rgba(15, 23, 42, 0.07), 0 16px 40px rgba(15, 23, 42, 0.13);
+  --sh-indigo: 0 8px 24px rgba(79, 70, 229, 0.3);
+
+  /* Shape — 8px grid */
+  --r-md: 12px;
+  --r-lg: 16px;
+  --r-xl: 20px;
+  --r-2xl: 24px;
+  --s-1: 8px;
+  --s-2: 16px;
+  --s-3: 24px;
+  --s-4: 32px;
+  --s-5: 40px;
+  --s-6: 48px;
+
+  /* Motion */
+  --dur-fast: 150ms;
+  --dur-base: 280ms;
+  --dur-slow: 480ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --font:
+    'Inter', 'SF Pro Text', 'Segoe UI Variable Text', 'Segoe UI', system-ui,
+    -apple-system, sans-serif;
+
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  --indigo: #6366f1;
+  --indigo-deep: #818cf8;
+  --indigo-soft: #1e1b4b;
+  --indigo-ghost: #312e81;
+  --emerald: #34d399;
+  --emerald-deep: #6ee7b7;
+  --emerald-soft: #0a2e21;
+  --cyan: #22d3ee;
+  --cyan-deep: #67e8f9;
+  --cyan-soft: #083344;
+  --amber: #fbbf24;
+  --amber-soft: #2a2008;
+  --rose: #fb7185;
+  --rose-soft: #3b0a14;
+
+  --ground: #0b1220;
+  --card: #131c2e;
+  --card-2: #1b2740;
+  --ink: #eaf0fa;
+  --ink-2: #a9b7ce;
+  --ink-3: #64748b;
+  --line: #243149;
+  --on-accent: #0b1220;
+
+  --skeleton-bone: #818cf8;
+  --skeleton-joint: #34d399;
+
+  --sh-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 14px rgba(0, 0, 0, 0.35);
+  --sh-2: 0 4px 10px rgba(0, 0, 0, 0.4), 0 16px 40px rgba(0, 0, 0, 0.5);
+  --sh-indigo: 0 8px 24px rgba(99, 102, 241, 0.35);
+
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
