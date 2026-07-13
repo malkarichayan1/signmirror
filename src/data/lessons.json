@@ -31,8 +31,20 @@
   },
   {
     "id": "alphabet-5",
-    "title": "Alphabet: U–Y",
+    "title": "Alphabet: U–Z",
     "signs": ["u", "v", "w", "x", "y", "z"],
     "unlockedBy": "alphabet-4"
+  },
+  {
+    "id": "numbers-1",
+    "title": "Numbers: 1–5",
+    "signs": ["1", "2", "3", "4", "5"],
+    "unlockedBy": "alphabet-5"
+  },
+  {
+    "id": "numbers-2",
+    "title": "Numbers: 6–10",
+    "signs": ["6", "7", "8", "9", "10"],
+    "unlockedBy": "numbers-1"
   }
 ]
