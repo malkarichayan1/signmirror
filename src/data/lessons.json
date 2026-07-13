@@ -16,5 +16,23 @@
     "title": "Alphabet: F–J",
     "signs": ["f", "g", "h", "i", "j"],
     "unlockedBy": "alphabet-1"
+  },
+  {
+    "id": "alphabet-3",
+    "title": "Alphabet: K–O",
+    "signs": ["k", "l", "m", "n", "o"],
+    "unlockedBy": "alphabet-2"
+  },
+  {
+    "id": "alphabet-4",
+    "title": "Alphabet: P–T",
+    "signs": ["p", "q", "r", "s", "t"],
+    "unlockedBy": "alphabet-3"
+  },
+  {
+    "id": "alphabet-5",
+    "title": "Alphabet: U–Y",
+    "signs": ["u", "v", "w", "x", "y", "z"],
+    "unlockedBy": "alphabet-4"
   }
 ]
