@@ -59,9 +59,10 @@ export function markLessonComplete(lessonId) {
   saveProgress(progress);
 }
 
-export function isLessonUnlocked(lesson, progress) {
-  if (!lesson.unlockedBy) return true;
-  return Boolean(progress[lesson.unlockedBy]?.completed);
+// All lessons (getting started, alphabet, numbers) are beginner-level and
+// independent of each other, so nothing is gated behind prior completion.
+export function isLessonUnlocked() {
+  return true;
 }
 
 // Signs the user attempted or skipped but never passed, across all lessons.
