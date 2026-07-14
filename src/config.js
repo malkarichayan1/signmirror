@@ -3,12 +3,13 @@
 // Mean Euclidean distance (in normalized units) below which a sign is accepted.
 // Lower = stricter. Real-time webcam landmarks are noisier than the static
 // dataset photos references were extracted from, so this is looser than the
-// original 0.08 starting point — tighten again once real-world data confirms
-// it's not producing false positives.
-export const MATCH_THRESHOLD = 0.14;
+// original 0.08 starting point. Raised again after user testing reported the
+// matcher as "very sensitive" — tighten only if this starts accepting clearly
+// wrong hand shapes.
+export const MATCH_THRESHOLD = 0.2;
 
 // Milliseconds the pose must be held continuously to count as a pass.
-export const HOLD_DURATION_MS = 1500;
+export const HOLD_DURATION_MS = 1000;
 
 // Reserved for a future consecutive-frame debounce (not used in Phase 1).
 export const PASS_HOLD_FRAMES = 15;

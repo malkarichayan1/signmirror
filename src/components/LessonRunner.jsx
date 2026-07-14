@@ -26,6 +26,7 @@ import './LessonRunner.css';
 const FAIL_PCT_THRESHOLD = 0.15;
 const MOTION_FAIL_LIMIT  = 3;
 const MIN_CAPTURE_DURATION_MS = 1800; // floor so short reference clips still give the user time to sign
+const HOLD_GRACE_MS = 500; // tolerate brief landmark jitter without resetting hold progress
 
 // ── Static sign: hold-progress ring ────────────────────────────────────────
 
@@ -113,6 +114,7 @@ export default function LessonRunner({ lesson, onComplete }) {
 
   // ── Refs (rAF-safe, avoid stale closure issues) ───────────────────────────
   const holdStartRef        = useRef(null);
+  const holdFailStartRef    = useRef(null); // when the current grace-period dip began, or null
   const passedRef           = useRef(false);
   const failedHoldsRef      = useRef(0);
   const retriedRef          = useRef(new Set());
@@ -158,6 +160,7 @@ export default function LessonRunner({ lesson, onComplete }) {
     passedRef.current        = false;
     failedHoldsRef.current   = 0;
     holdStartRef.current     = null;
+    holdFailStartRef.current = null;
     motionFailCountRef.current = 0;
     recordingFramesRef.current = [];
     handLostRef.current      = false;
@@ -204,8 +207,9 @@ export default function LessonRunner({ lesson, onComplete }) {
     // Reset static-sign hold state.
     setHoldPct(0);
     setMatchResult({ distance: null, pass: false });
-    holdStartRef.current   = null;
-    failedHoldsRef.current = 0;
+    holdStartRef.current     = null;
+    holdFailStartRef.current = null;
+    failedHoldsRef.current   = 0;
   }
 
   function passCurrentSign() {
@@ -247,6 +251,7 @@ export default function LessonRunner({ lesson, onComplete }) {
     passedRef.current        = false;
     failedHoldsRef.current   = 0;
     holdStartRef.current     = null;
+    holdFailStartRef.current = null;
     recordingFramesRef.current = [];
     handLostRef.current      = false;
     setHoldPct(0);
@@ -262,6 +267,7 @@ export default function LessonRunner({ lesson, onComplete }) {
     clearTimeout(recordingTimerRef.current);
     retriedRef.current         = new Set();
     holdStartRef.current       = null;
+    holdFailStartRef.current   = null;
     passedRef.current          = false;
     failedHoldsRef.current     = 0;
     motionFailCountRef.current = 0;
@@ -401,19 +407,24 @@ export default function LessonRunner({ lesson, onComplete }) {
     setMatchResult(result);
 
     if (result.pass) {
+      holdFailStartRef.current = null;
       if (holdStartRef.current === null) holdStartRef.current = performance.now();
       const elapsed = performance.now() - holdStartRef.current;
       const pct     = Math.min(elapsed / HOLD_DURATION_MS, 1);
       setHoldPct(pct);
       if (pct >= 1) passCurrentSign();
-    } else {
-      if (holdStartRef.current !== null) {
+    } else if (holdStartRef.current !== null) {
+      // A single noisy frame shouldn't wipe out an otherwise-steady hold —
+      // only reset once the dip has persisted past a short grace window.
+      if (holdFailStartRef.current === null) holdFailStartRef.current = performance.now();
+      if (performance.now() - holdFailStartRef.current > HOLD_GRACE_MS) {
         const pct = (performance.now() - holdStartRef.current) / HOLD_DURATION_MS;
         if (pct > FAIL_PCT_THRESHOLD) {
           failedHoldsRef.current += 1;
           if (failedHoldsRef.current >= 3) setMode('hint');
         }
-        holdStartRef.current = null;
+        holdStartRef.current     = null;
+        holdFailStartRef.current = null;
         setHoldPct(0);
       }
     }
