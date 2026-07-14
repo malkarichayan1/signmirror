@@ -25,6 +25,7 @@ import './LessonRunner.css';
 
 const FAIL_PCT_THRESHOLD = 0.15;
 const MOTION_FAIL_LIMIT  = 3;
+const MIN_CAPTURE_DURATION_MS = 1800; // floor so short reference clips still give the user time to sign
 
 // ── Static sign: hold-progress ring ────────────────────────────────────────
 
@@ -125,6 +126,7 @@ export default function LessonRunner({ lesson, onComplete }) {
   const recordingTimerRef   = useRef(null);
   const handLostRef         = useRef(false);
   const motionFailCountRef  = useRef(0);
+  const lastFrameCaptureRef = useRef(0);     // throttles pushes to MOTION_FPS, matching reference data
 
   const currentSign  = queue[0] ?? null;
   const isMotionSign = currentSign?.type === 'motion';
@@ -324,12 +326,16 @@ export default function LessonRunner({ lesson, onComplete }) {
   function startRecording() {
     recordingFramesRef.current = [];
     handLostRef.current        = false;
+    lastFrameCaptureRef.current = 0;
     refFramesRef.current       = currentSign.frames;
     setMode('recording');
     setMotionStatus('Recording…');
 
     const refDurationMs     = (currentSign.frames.length / (currentSign.fps ?? MOTION_FPS)) * 1000;
-    const captureDurationMs = Math.min(refDurationMs * 1.5, MOTION_MAX_DURATION_MS);
+    const captureDurationMs = Math.min(
+      Math.max(refDurationMs * 1.5, MIN_CAPTURE_DURATION_MS),
+      MOTION_MAX_DURATION_MS,
+    );
 
     recordingTimerRef.current = setTimeout(stopRecordingAndScore, captureDurationMs);
   }
@@ -367,6 +373,9 @@ export default function LessonRunner({ lesson, onComplete }) {
         setMode('hint');
         return;
       }
+      const now = performance.now();
+      if (now - lastFrameCaptureRef.current < 1000 / MOTION_FPS) return;
+      lastFrameCaptureRef.current = now;
       recordingFramesRef.current.push(normalized);
       return;
     }
