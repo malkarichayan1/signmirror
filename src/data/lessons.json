@@ -46,5 +46,29 @@
     "title": "Numbers: 6–10",
     "signs": ["6", "7", "8", "9", "10"],
     "unlockedBy": "numbers-1"
+  },
+  {
+    "id": "colors",
+    "title": "Colors",
+    "signs": ["red", "blue", "green", "yellow", "black"],
+    "unlockedBy": "numbers-2"
+  },
+  {
+    "id": "family",
+    "title": "Family",
+    "signs": ["mom", "dad", "brother", "boy", "girl"],
+    "unlockedBy": "colors"
+  },
+  {
+    "id": "animals",
+    "title": "Animals",
+    "signs": ["dog", "cat", "bird", "fish", "cow"],
+    "unlockedBy": "family"
+  },
+  {
+    "id": "feelings",
+    "title": "Feelings",
+    "signs": ["happy", "sad", "hungry", "thirsty", "sick"],
+    "unlockedBy": "animals"
   }
 ]
