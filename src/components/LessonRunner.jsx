@@ -2,7 +2,6 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import WebcamView from './WebcamView.jsx';
 import SignPrompt from './SignPrompt.jsx';
 import FeedbackPanel from './FeedbackPanel.jsx';
-import SkeletonReplay from './SkeletonReplay.jsx';
 import ExpandableHandPreview from './ExpandableHandPreview.jsx';
 import { matchPose } from '../lib/matcher.js';
 import { trimStationaryFrames } from '../lib/sequenceMatcher.js';
@@ -471,9 +470,7 @@ export default function LessonRunner({ lesson, onComplete }) {
           // ── Motion sign sidebar ─────────────────────────────────────────
           <>
             <div className="motion-reference">
-              <ExpandableHandPreview frames={currentSign.frames} fps={currentSign.fps ?? MOTION_FPS} label={currentSign.name}>
-                <SkeletonReplay frames={currentSign.frames} fps={currentSign.fps ?? MOTION_FPS} size={200} />
-              </ExpandableHandPreview>
+              <ExpandableHandPreview frames={currentSign.frames} fps={currentSign.fps ?? MOTION_FPS} label={currentSign.name} />
               <p className="motion-sign-name">{currentSign.name}</p>
               {currentSign.description && (
                 <p className="motion-sign-desc">{currentSign.description}</p>

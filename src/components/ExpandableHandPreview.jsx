@@ -6,7 +6,7 @@ import './ExpandableHandPreview.css';
 // user actually opens the 3D view, not on initial page load.
 const Hand3DModal = lazy(() => import('./Hand3DModal.jsx'));
 
-export default function ExpandableHandPreview({ frames, fps, label, children }) {
+export default function ExpandableHandPreview({ frames, fps, label }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -17,8 +17,8 @@ export default function ExpandableHandPreview({ frames, fps, label, children }) 
         onClick={() => setOpen(true)}
         aria-label={`View ${label ?? 'hand shape'} in 3D`}
       >
-        {children}
-        <span className="expandable-hand-badge">🔄 3D</span>
+        <span className="expandable-hand-icon" aria-hidden="true">🖐️</span>
+        <span className="expandable-hand-label">View 3D hand</span>
       </button>
       {open &&
         createPortal(

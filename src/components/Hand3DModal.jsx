@@ -20,23 +20,32 @@ const BONE_RADIUS  = 0.032;
 const SKIN_COLOR   = 0xe3a97e;
 const UP_AXIS      = new THREE.Vector3(0, 1, 0);
 
+// Landmarks store the wrist at the origin with the hand extending downward
+// (+y in image space), so raw coords are not centered on anything useful.
+// Convert to scene space (flip y and z) here in one place.
+function toScene(lm) {
+  return new THREE.Vector3(lm.x, -lm.y, -lm.z);
+}
+
 function buildHand(scene) {
-  const material = new THREE.MeshStandardMaterial({ color: SKIN_COLOR, roughness: 0.65 });
+  const group = new THREE.Group();
+  scene.add(group);
+  const material = new THREE.MeshStandardMaterial({ color: SKIN_COLOR, roughness: 0.6 });
   const joints = Array.from({ length: 21 }, () => {
-    const mesh = new THREE.Mesh(new THREE.SphereGeometry(JOINT_RADIUS, 14, 14), material);
-    scene.add(mesh);
+    const mesh = new THREE.Mesh(new THREE.SphereGeometry(JOINT_RADIUS, 16, 16), material);
+    group.add(mesh);
     return mesh;
   });
   const bones = BONES.map(() => {
-    const mesh = new THREE.Mesh(new THREE.CylinderGeometry(BONE_RADIUS, BONE_RADIUS, 1, 10, 1), material);
-    scene.add(mesh);
+    const mesh = new THREE.Mesh(new THREE.CylinderGeometry(BONE_RADIUS, BONE_RADIUS, 1, 12, 1), material);
+    group.add(mesh);
     return mesh;
   });
-  return { joints, bones, material };
+  return { group, joints, bones, material };
 }
 
 function positionHand({ joints, bones }, landmarks) {
-  const pts = landmarks.map((lm) => new THREE.Vector3(lm.x, -lm.y, -lm.z));
+  const pts = landmarks.map(toScene);
   pts.forEach((p, i) => joints[i].position.copy(p));
   BONES.forEach(([a, b], i) => {
     const pa = pts[a];
@@ -50,6 +59,19 @@ function positionHand({ joints, bones }, landmarks) {
   });
 }
 
+// Bounding box across EVERY frame so the whole hand (and its full motion)
+// stays framed no matter which pose is showing.
+function computeFraming(frames) {
+  const box = new THREE.Box3();
+  for (const frame of frames) {
+    for (const lm of frame) box.expandByPoint(toScene(lm));
+  }
+  const center = box.getCenter(new THREE.Vector3());
+  const size   = box.getSize(new THREE.Vector3());
+  const radius = 0.5 * Math.max(size.x, size.y, size.z) + JOINT_RADIUS;
+  return { center, radius };
+}
+
 export default function Hand3DModal({ frames, fps = 15, onClose, label }) {
   const mountRef = useRef(null);
 
@@ -60,8 +82,8 @@ export default function Hand3DModal({ frames, fps = 15, onClose, label }) {
 
     const scene = new THREE.Scene();
 
-    const camera = new THREE.PerspectiveCamera(45, width / height, 0.01, 100);
-    camera.position.set(0, 0.2, 2.2);
+    const fov = 45;
+    const camera = new THREE.PerspectiveCamera(fov, width / height, 0.01, 100);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(width, height);
@@ -70,15 +92,26 @@ export default function Hand3DModal({ frames, fps = 15, onClose, label }) {
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
-    controls.minDistance = 0.4;
-    controls.maxDistance = 6;
 
-    scene.add(new THREE.AmbientLight(0xffffff, 0.75));
-    const dirLight = new THREE.DirectionalLight(0xffffff, 0.9);
+    scene.add(new THREE.AmbientLight(0xffffff, 0.8));
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.85);
     dirLight.position.set(1.5, 2, 3);
     scene.add(dirLight);
 
     const hand = buildHand(scene);
+
+    // Center the hand at the origin and pull the camera back far enough that
+    // the whole bounding sphere fits within the vertical field of view.
+    const { center, radius } = computeFraming(frames);
+    hand.group.position.set(-center.x, -center.y, -center.z);
+
+    const fitDistance = (radius * 1.25) / Math.sin((fov * Math.PI) / 180 / 2);
+    camera.position.set(0, 0, fitDistance);
+    camera.updateProjectionMatrix();
+    controls.target.set(0, 0, 0);
+    controls.minDistance = radius * 0.4;
+    controls.maxDistance = fitDistance * 5;
+    controls.update();
 
     let frameIdx  = 0;
     let lastTime  = 0;
