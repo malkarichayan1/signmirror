@@ -1,0 +1,63 @@
+.hand3d-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.7);
+  backdrop-filter: blur(4px);
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+  padding: var(--s-3);
+}
+
+.hand3d-panel {
+  width: min(560px, 100%);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-xl);
+  box-shadow: var(--sh-2);
+  padding: var(--s-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+}
+
+.hand3d-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.hand3d-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.hand3d-close {
+  background: var(--card-2);
+  color: var(--ink-2);
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r-md);
+  font-size: 15px;
+  cursor: pointer;
+}
+.hand3d-close:hover {
+  color: var(--ink);
+}
+
+.hand3d-canvas-mount {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--r-lg);
+  background: linear-gradient(145deg, var(--indigo-soft), var(--cyan-soft));
+  overflow: hidden;
+  touch-action: none;
+}
+
+.hand3d-hint {
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--ink-3);
+}
