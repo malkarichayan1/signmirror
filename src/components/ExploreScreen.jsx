@@ -26,6 +26,38 @@ const CATEGORIES = [
     grad: 'grad-emerald',
     match: id => id.startsWith('numbers'),
   },
+  {
+    id: 'colors',
+    title: 'Colors',
+    desc: 'Sign your favorite colors',
+    emoji: '🎨',
+    grad: 'grad-rose',
+    match: id => id === 'colors',
+  },
+  {
+    id: 'family',
+    title: 'Family',
+    desc: 'Sign your family members',
+    emoji: '👪',
+    grad: 'grad-amber',
+    match: id => id === 'family',
+  },
+  {
+    id: 'animals',
+    title: 'Animals',
+    desc: 'Sign common animals',
+    emoji: '🐾',
+    grad: 'grad-teal',
+    match: id => id === 'animals',
+  },
+  {
+    id: 'feelings',
+    title: 'Feelings',
+    desc: 'Express how you feel',
+    emoji: '😊',
+    grad: 'grad-violet',
+    match: id => id === 'feelings',
+  },
 ];
 
 export default function ExploreScreen({ lessons, progress, onStartLesson }) {
