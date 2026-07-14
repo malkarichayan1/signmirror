@@ -1,8 +1,11 @@
 // All tunable constants live here. Edit this file when calibrating the matcher.
 
 // Mean Euclidean distance (in normalized units) below which a sign is accepted.
-// Lower = stricter. Start at 0.08 and decrease as reference data improves.
-export const MATCH_THRESHOLD = 0.08;
+// Lower = stricter. Real-time webcam landmarks are noisier than the static
+// dataset photos references were extracted from, so this is looser than the
+// original 0.08 starting point — tighten again once real-world data confirms
+// it's not producing false positives.
+export const MATCH_THRESHOLD = 0.14;
 
 // Milliseconds the pose must be held continuously to count as a pass.
 export const HOLD_DURATION_MS = 1500;
