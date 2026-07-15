@@ -111,6 +111,15 @@
   border-color: var(--emerald);
 }
 
+.lesson-tile.mastered {
+  border-color: #d4af37;
+  box-shadow: 0 0 0 1px #d4af37 inset;
+}
+
+.lesson-tile.needs-review {
+  border-color: var(--amber);
+}
+
 .lesson-tile-head {
   display: flex;
   justify-content: space-between;
@@ -129,6 +138,11 @@
 
 .lesson-tile-badge.check {
   color: var(--emerald-deep);
+  font-weight: 800;
+}
+
+.lesson-tile-badge.mastered,
+.lesson-tile-badge.needs-review {
   font-weight: 800;
 }
 

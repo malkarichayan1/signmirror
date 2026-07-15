@@ -1,4 +1,5 @@
 import { isLessonUnlocked } from '../lib/progress.js';
+import { loadMasteryData, getLessonDisplayState } from '../lib/masteryProgress.js';
 import './TabScreens.css';
 
 const CATEGORIES = [
@@ -61,6 +62,8 @@ const CATEGORIES = [
 ];
 
 export default function ExploreScreen({ lessons, progress, onStartLesson }) {
+  const masteryData = loadMasteryData();
+
   return (
     <div className="screen">
       <h2 className="tab-title">Explore</h2>
@@ -85,35 +88,37 @@ export default function ExploreScreen({ lessons, progress, onStartLesson }) {
             <div className="lesson-grid">
               {catLessons.map(lesson => {
                 const unlocked = isLessonUnlocked(lesson, progress);
-                const isComplete = Boolean(progress[lesson.id]?.completed);
+                const state = getLessonDisplayState(lesson.id, progress, masteryData);
                 const done = lesson.signs.filter(
                   s => progress[lesson.id]?.signs?.[s.id]?.passed
                 ).length;
+                const stateLabel = {
+                  mastered: ' — mastered',
+                  'needs-review': ' — needs review',
+                  completed: ' — completed',
+                  'in-progress': '',
+                }[state];
                 return (
                   <button
                     key={lesson.id}
-                    className={`lesson-tile ${isComplete ? 'done' : ''}`}
+                    className={`lesson-tile ${state === 'completed' ? 'done' : ''} ${state}`}
                     disabled={!unlocked}
                     onClick={() => unlocked && onStartLesson(lesson)}
-                    aria-label={
-                      !unlocked
-                        ? `${lesson.title} — locked`
-                        : isComplete
-                          ? `${lesson.title} — completed`
-                          : lesson.title
-                    }
+                    aria-label={!unlocked ? `${lesson.title} — locked` : `${lesson.title}${stateLabel}`}
                   >
                     <span className="lesson-tile-head">
                       <b>{lesson.title}</b>
                       {!unlocked && (
-                        <span className="lesson-tile-badge" aria-hidden="true">
-                          🔒
-                        </span>
+                        <span className="lesson-tile-badge" aria-hidden="true">🔒</span>
                       )}
-                      {isComplete && (
-                        <span className="lesson-tile-badge check" aria-hidden="true">
-                          ✓
-                        </span>
+                      {state === 'mastered' && (
+                        <span className="lesson-tile-badge mastered" aria-hidden="true">🏆</span>
+                      )}
+                      {state === 'needs-review' && (
+                        <span className="lesson-tile-badge needs-review" aria-hidden="true">⚠️</span>
+                      )}
+                      {state === 'completed' && (
+                        <span className="lesson-tile-badge check" aria-hidden="true">✓</span>
                       )}
                     </span>
                     <span className="lesson-tile-meta">

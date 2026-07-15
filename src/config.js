@@ -41,3 +41,44 @@ export const MOTION_FPS = 15;
 
 // Maximum capture duration for a motion attempt (milliseconds).
 export const MOTION_MAX_DURATION_MS = 5000;
+
+// ── Mastery Test ─────────────────────────────────────────────────────────
+
+// Questions per attempt. Generation clamps to however many are actually
+// available if a learner hasn't completed enough lessons yet.
+export const MASTERY_QUESTION_COUNT = 20;
+
+// Share of questions that should be "perform the sign on camera" rather than
+// multiple choice. Capped by MASTERY_MAX_PERFORM_QUESTIONS so a 20-question
+// test doesn't turn into 20 camera reps.
+export const MASTERY_QUESTION_TYPE_WEIGHTS = {
+  perform: 0.15,
+  signToMeaning: 0.45,
+  // meaning-to-sign gets the remainder.
+};
+export const MASTERY_MAX_PERFORM_QUESTIONS = 3;
+
+// Below this many signs across completed lessons, there isn't enough of a
+// distractor pool for 4-choice questions, so every question falls back to
+// the "perform" type instead.
+export const MASTERY_MIN_POOL_FOR_CHOICES = 4;
+
+// Overall score needed to mark a completed lesson's signs as Mastered.
+export const MASTERY_PASS_THRESHOLD = 90;
+
+// Per-lesson score below which a Mastery Test result counts as "poor" for
+// that lesson. Two consecutive poor results on a Mastered lesson downgrade
+// it back to Needs Review.
+export const MASTERY_LESSON_POOR_THRESHOLD = 60;
+
+// How many past attempts to keep for trend detection (lesson downgrades)
+// and the optional history view.
+export const MASTERY_HISTORY_LIMIT = 20;
+
+// Badge thresholds, highest first. Configurable without touching scoring logic.
+export const MASTERY_BADGES = [
+  { id: 'perfect', label: 'Perfect', emoji: '💎', min: 100 },
+  { id: 'gold',    label: 'Gold',    emoji: '🥇', min: 90 },
+  { id: 'silver',  label: 'Silver',  emoji: '🥈', min: 80 },
+  { id: 'bronze',  label: 'Bronze',  emoji: '🥉', min: 70 },
+];

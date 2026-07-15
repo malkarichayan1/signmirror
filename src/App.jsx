@@ -4,6 +4,7 @@ import ExploreScreen from './components/ExploreScreen.jsx';
 import PracticeScreen from './components/PracticeScreen.jsx';
 import ProgressScreen from './components/ProgressScreen.jsx';
 import ProfileScreen from './components/ProfileScreen.jsx';
+import MasteryScreen from './components/MasteryScreen.jsx';
 import Onboarding from './components/Onboarding.jsx';
 import LessonRunner from './components/LessonRunner.jsx';
 import {
@@ -64,6 +65,15 @@ const NAV_ITEMS = [
         <path d="M10 20V4" />
         <path d="M16 20v-7" />
         <path d="M22 20H2" />
+      </svg>
+    ),
+  },
+  {
+    id: 'mastery',
+    label: 'Mastery',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M12 2 15 8.5 22 9.5 17 14.3 18.2 21.3 12 18 5.8 21.3 7 14.3 2 9.5 9 8.5Z" />
       </svg>
     ),
   },
@@ -216,6 +226,14 @@ export default function App() {
       )}
       {tab === 'progress' && (
         <ProgressScreen lessons={LESSONS} progress={progress} stats={stats} />
+      )}
+      {tab === 'mastery' && (
+        <MasteryScreen
+          lessons={LESSONS}
+          progress={progress}
+          onAttemptRecorded={() => setDataKey(k => k + 1)}
+          onDone={() => setTab('learn')}
+        />
       )}
       {tab === 'profile' && (
         <ProfileScreen
