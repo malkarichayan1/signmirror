@@ -8,6 +8,7 @@ const Hand3DModal = lazy(() => import('./Hand3DModal.jsx'));
 
 export default function ExpandableHandPreview({ frames, fps, label }) {
   const [open, setOpen] = useState(false);
+  const isMotion = frames.length > 1;
 
   return (
     <>
@@ -15,10 +16,16 @@ export default function ExpandableHandPreview({ frames, fps, label }) {
         type="button"
         className="expandable-hand-trigger"
         onClick={() => setOpen(true)}
-        aria-label={`View ${label ?? 'hand shape'} in 3D`}
+        aria-label={
+          isMotion
+            ? `View ${label ?? 'hand shape'} in 3D — this sign is a moving animation`
+            : `View ${label ?? 'hand shape'} in 3D`
+        }
       >
-        <span className="expandable-hand-icon" aria-hidden="true">🖐️</span>
-        <span className="expandable-hand-label">View 3D hand</span>
+        <span className="expandable-hand-icon" aria-hidden="true">{isMotion ? '🔄' : '🖐️'}</span>
+        <span className="expandable-hand-label">
+          {isMotion ? 'View 3D hand (animated)' : 'View 3D hand'}
+        </span>
       </button>
       {open &&
         createPortal(

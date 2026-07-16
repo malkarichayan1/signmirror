@@ -44,6 +44,18 @@ function buildHand(scene) {
   return { group, joints, bones, material };
 }
 
+// Linear interpolation between two same-shaped landmark frames — lets
+// playback move continuously between captured keyframes instead of
+// snapping, which is what made sparse-frame recordings (some signs have as
+// few as 5-9 captured frames) look glitchy.
+function lerpFrames(a, b, t) {
+  return a.map((lm, i) => ({
+    x: lm.x + (b[i].x - lm.x) * t,
+    y: lm.y + (b[i].y - lm.y) * t,
+    z: lm.z + (b[i].z - lm.z) * t,
+  }));
+}
+
 function positionHand({ joints, bones }, landmarks) {
   const pts = landmarks.map(toScene);
   pts.forEach((p, i) => joints[i].position.copy(p));
@@ -74,6 +86,7 @@ function computeFraming(frames) {
 
 export default function Hand3DModal({ frames, fps = 15, onClose, label }) {
   const mountRef = useRef(null);
+  const isMotion = frames.length > 1;
 
   useEffect(() => {
     const mount = mountRef.current;
@@ -113,19 +126,24 @@ export default function Hand3DModal({ frames, fps = 15, onClose, label }) {
     controls.maxDistance = fitDistance * 5;
     controls.update();
 
-    let frameIdx  = 0;
-    let lastTime  = 0;
-    let posedOnce = false;
-    const interval = 1000 / fps;
+    let posedOnce  = false;
+    let cycleStart = null;
+    const cycleDurationMs = (frames.length / fps) * 1000;
     let raf;
 
     function tick(now) {
       if (frames.length > 1) {
-        if (now - lastTime >= interval) {
-          positionHand(hand, frames[frameIdx]);
-          frameIdx = (frameIdx + 1) % frames.length;
-          lastTime = now;
-        }
+        if (cycleStart === null) cycleStart = now;
+        // Map wall-clock time to a continuous (fractional) position along
+        // the frame sequence, then interpolate — smooth regardless of how
+        // sparse the captured keyframes are, instead of hard-cutting
+        // between them every 1000/fps ms.
+        const elapsed = (now - cycleStart) % cycleDurationMs;
+        const virtualIdx = (elapsed / cycleDurationMs) * frames.length;
+        const i = Math.floor(virtualIdx) % frames.length;
+        const j = (i + 1) % frames.length;
+        const t = virtualIdx - Math.floor(virtualIdx);
+        positionHand(hand, lerpFrames(frames[i], frames[j], t));
       } else if (!posedOnce) {
         positionHand(hand, frames[0]);
         posedOnce = true;
@@ -172,6 +190,11 @@ export default function Hand3DModal({ frames, fps = 15, onClose, label }) {
             ✕
           </button>
         </div>
+        {isMotion && (
+          <p className="hand3d-motion-notice">
+            <span aria-hidden="true">🔄</span> This sign is a moving motion, not a held pose — watch it loop to see the full movement.
+          </p>
+        )}
         <div ref={mountRef} className="hand3d-canvas-mount" />
         <p className="hand3d-hint">Drag to rotate · Scroll to zoom · Right-drag to pan</p>
       </div>

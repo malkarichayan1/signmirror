@@ -61,3 +61,17 @@
   font-size: 12.5px;
   color: var(--ink-3);
 }
+
+.hand3d-motion-notice {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--indigo, #4f46e5);
+  background: var(--indigo-soft);
+  border-radius: var(--r-md);
+  padding: 8px 12px;
+}
