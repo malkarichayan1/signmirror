@@ -6,6 +6,7 @@ export default function PracticeScreen({
   mistakeCount,
   onStartLesson,
   onPracticeMistakes,
+  onOpenFingerspelling,
 }) {
   return (
     <div className="screen">
@@ -39,6 +40,14 @@ export default function PracticeScreen({
           </span>
         </button>
       )}
+
+      <button className="practice-row" onClick={onOpenFingerspelling}>
+        <span className="practice-row-icon" aria-hidden="true">🔤</span>
+        <span>
+          <b>Fingerspelling Trainer</b>
+          <span>Spell random words letter by letter on camera</span>
+        </span>
+      </button>
 
       {completedLessons.length > 0 && (
         <>

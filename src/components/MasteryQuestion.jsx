@@ -237,7 +237,10 @@ function PerformQuestion({ question, onAnswer }) {
 
       {(phase === 'active' || phase === 'countdown') && (
         <div className="mastery-webcam-wrap">
-          <WebcamView onLandmarks={handleLandmarks} />
+          <WebcamView
+            onLandmarks={handleLandmarks}
+            referenceLandmarks={!isMotion ? sign.landmarks : null}
+          />
         </div>
       )}
 

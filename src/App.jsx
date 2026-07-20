@@ -8,6 +8,8 @@ import MasteryScreen from './components/MasteryScreen.jsx';
 import Onboarding from './components/Onboarding.jsx';
 import AuthScreen from './components/AuthScreen.jsx';
 import LessonRunner from './components/LessonRunner.jsx';
+import FingerspellingRunner from './components/FingerspellingRunner.jsx';
+import DictionaryScreen from './components/DictionaryScreen.jsx';
 import {
   loadProgress,
   isLessonUnlocked,
@@ -98,6 +100,8 @@ const NAV_ITEMS = [
 export default function App() {
   const [tab, setTab] = useState('learn');
   const [runningLesson, setRunningLesson] = useState(null);
+  const [fingerspellingOpen, setFingerspellingOpen] = useState(false);
+  const [dictionaryOpen, setDictionaryOpen] = useState(false);
   const [dataKey, setDataKey] = useState(0);
   const [settings, setSettings] = useState(() => loadSettings());
 
@@ -163,6 +167,11 @@ export default function App() {
 
   function exitLesson() {
     setRunningLesson(null);
+    setDataKey(k => k + 1);
+  }
+
+  function exitFingerspelling() {
+    setFingerspellingOpen(false);
     setDataKey(k => k + 1);
   }
 
@@ -246,6 +255,34 @@ export default function App() {
     );
   }
 
+  if (fingerspellingOpen) {
+    return (
+      <div className="shell">
+        <div className="runner-bar">
+          <button className="runner-close" onClick={exitFingerspelling} aria-label="Exit fingerspelling trainer">
+            ✕
+          </button>
+          <span className="runner-bar-title">Fingerspelling Trainer</span>
+        </div>
+        <FingerspellingRunner onExit={exitFingerspelling} />
+      </div>
+    );
+  }
+
+  if (dictionaryOpen) {
+    return (
+      <div className="shell">
+        <div className="runner-bar">
+          <button className="runner-close" onClick={() => setDictionaryOpen(false)} aria-label="Close dictionary">
+            ✕
+          </button>
+          <span className="runner-bar-title">Dictionary</span>
+        </div>
+        <DictionaryScreen />
+      </div>
+    );
+  }
+
   const continueLesson = LESSONS.find(
     l => isLessonUnlocked(l, progress) && !progress[l.id]?.completed
   );
@@ -273,10 +310,16 @@ export default function App() {
           mistakeCount={mistakeSigns.length}
           onStartLesson={startLesson}
           onPracticeMistakes={startMistakePractice}
+          onOpenFingerspelling={() => setFingerspellingOpen(true)}
         />
       )}
       {tab === 'explore' && (
-        <ExploreScreen lessons={LESSONS} progress={progress} onStartLesson={startLesson} />
+        <ExploreScreen
+          lessons={LESSONS}
+          progress={progress}
+          onStartLesson={startLesson}
+          onOpenDictionary={() => setDictionaryOpen(true)}
+        />
       )}
       {tab === 'progress' && (
         <ProgressScreen lessons={LESSONS} progress={progress} stats={stats} />

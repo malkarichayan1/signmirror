@@ -82,3 +82,8 @@ export const MASTERY_BADGES = [
   { id: 'silver',  label: 'Silver',  emoji: '🥈', min: 80 },
   { id: 'bronze',  label: 'Bronze',  emoji: '🥉', min: 70 },
 ];
+
+// ── Fingerspelling Trainer ──────────────────────────────────────────────────
+
+// Flat XP bonus awarded on top of per-letter XP when a whole word is spelled.
+export const FINGERSPELLING_WORD_BONUS_XP = 15;

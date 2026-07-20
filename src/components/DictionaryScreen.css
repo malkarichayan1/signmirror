@@ -1,0 +1,54 @@
+.dict-search {
+  width: 100%;
+  padding: 13px 16px;
+  font-size: 15px;
+  font-family: inherit;
+  color: var(--ink);
+  background: var(--card);
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-lg);
+  margin-bottom: 20px;
+  transition: border-color var(--dur-fast);
+}
+
+.dict-search:focus {
+  outline: none;
+  border-color: var(--indigo);
+}
+
+.dict-empty {
+  color: var(--ink-3);
+  font-size: 14px;
+  text-align: center;
+  padding: 40px 0;
+}
+
+.dict-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px;
+}
+
+.dict-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-1);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.dict-card-name {
+  font-size: 14.5px;
+  color: var(--ink);
+}
+
+.dict-card-desc {
+  font-size: 12px;
+  color: var(--ink-3);
+  line-height: 1.4;
+}

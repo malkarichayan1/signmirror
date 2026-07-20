@@ -15,3 +15,8 @@ export function getSign(id) {
 export function getSigns(ids) {
   return ids.map(getSign).filter(Boolean);
 }
+
+// Every known sign, sorted alphabetically by name — used by the dictionary.
+export function getAllSigns() {
+  return Object.values(SIGN_MAP).sort((a, b) => a.name.localeCompare(b.name));
+}

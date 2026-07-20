@@ -30,7 +30,7 @@ const HOLD_GRACE_MS = 500; // tolerate brief landmark jitter without resetting h
 
 // ── Static sign: hold-progress ring ────────────────────────────────────────
 
-function HoldRing({ pct }) {
+export function HoldRing({ pct }) {
   const size = 88;
   const sw   = 8;
   const r    = (size - sw) / 2;
@@ -458,7 +458,10 @@ export default function LessonRunner({ lesson, onComplete }) {
         <i style={{ width: `${(doneCount / totalSigns) * 100}%` }} />
       </div>
       <div className="lesson-runner">
-        <WebcamView onLandmarks={handleLandmarks} />
+        <WebcamView
+          onLandmarks={handleLandmarks}
+          referenceLandmarks={!isMotionSign ? currentSign.landmarks : null}
+        />
 
       <div className="runner-sidebar">
         <div className="sign-counter">

@@ -61,13 +61,21 @@ const CATEGORIES = [
   },
 ];
 
-export default function ExploreScreen({ lessons, progress, onStartLesson }) {
+export default function ExploreScreen({ lessons, progress, onStartLesson, onOpenDictionary }) {
   const masteryData = loadMasteryData();
 
   return (
     <div className="screen">
       <h2 className="tab-title">Explore</h2>
       <p className="tab-sub">Browse every lesson by category.</p>
+
+      <button type="button" className="practice-row" onClick={onOpenDictionary}>
+        <span className="practice-row-icon" aria-hidden="true">🔍</span>
+        <span>
+          <b>Sign Dictionary</b>
+          <span>Search every sign you've learned</span>
+        </span>
+      </button>
 
       {CATEGORIES.map(cat => {
         const catLessons = lessons.filter(l => cat.match(l.id));
