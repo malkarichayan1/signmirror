@@ -33,6 +33,13 @@ button {
   flex-direction: column;
 }
 
+.auth-loading {
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-3);
+  font-size: 14px;
+}
+
 .screen {
   width: 100%;
   max-width: 680px;

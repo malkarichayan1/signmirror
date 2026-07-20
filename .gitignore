@@ -2,3 +2,5 @@ node_modules/
 dist/
 .DS_Store
 scripts/hand_landmarker.task
+.env
+.env.local

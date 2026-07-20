@@ -6,6 +6,7 @@ import ProgressScreen from './components/ProgressScreen.jsx';
 import ProfileScreen from './components/ProfileScreen.jsx';
 import MasteryScreen from './components/MasteryScreen.jsx';
 import Onboarding from './components/Onboarding.jsx';
+import AuthScreen from './components/AuthScreen.jsx';
 import LessonRunner from './components/LessonRunner.jsx';
 import {
   loadProgress,
@@ -15,9 +16,14 @@ import {
   getMistakeSigns,
 } from './lib/progress.js';
 import { loadStats, loadSettings, saveSettings } from './lib/stats.js';
+import { watchAuthState, signOutUser } from './lib/auth.js';
+import { pushLocalData } from './lib/cloudSync.js';
+import { isFirebaseConfigured } from './lib/firebase.js';
 import { getSigns } from './data/signLoader.js';
 import LESSONS_MANIFEST from './data/lessons.json';
 import './App.css';
+
+const AUTH_SKIPPED_KEY = 'signmirror_auth_skipped';
 
 // Resolve sign ID strings in the manifest to full sign data objects.
 const LESSONS = LESSONS_MANIFEST.map(lesson => ({
@@ -95,6 +101,12 @@ export default function App() {
   const [dataKey, setDataKey] = useState(0);
   const [settings, setSettings] = useState(() => loadSettings());
 
+  // undefined = still checking; null = signed out; object = signed in.
+  const [user, setUser] = useState(() => (isFirebaseConfigured ? undefined : null));
+  const [authSkipped, setAuthSkipped] = useState(
+    () => localStorage.getItem(AUTH_SKIPPED_KEY) === 'true'
+  );
+
   const progress = useMemo(() => loadProgress(), [dataKey]);
   const stats = useMemo(() => loadStats(), [dataKey]);
   const mistakeSigns = useMemo(() => getMistakeSigns(LESSONS, progress), [progress]);
@@ -104,6 +116,31 @@ export default function App() {
       document.documentElement.dataset.theme = settings.theme;
     }
   }, [settings.theme]);
+
+  useEffect(() => {
+    const unsubscribe = watchAuthState(nextUser => {
+      setUser(nextUser);
+      if (nextUser) setDataKey(k => k + 1); // reload state after a cloud pull on sign-in
+    });
+    return unsubscribe;
+  }, []);
+
+  // Keep the cloud copy current while signed in — fires whenever local
+  // progress/stats/mastery/settings change (dataKey bump) or settings save.
+  useEffect(() => {
+    if (user) pushLocalData(user.uid);
+  }, [user, dataKey, settings]);
+
+  function handleSignOut() {
+    signOutUser();
+    localStorage.removeItem(AUTH_SKIPPED_KEY);
+    setAuthSkipped(false);
+  }
+
+  function handleSkipAuth() {
+    localStorage.setItem(AUTH_SKIPPED_KEY, 'true');
+    setAuthSkipped(true);
+  }
 
   function updateSettings(next) {
     setSettings(saveSettings(next));
@@ -166,6 +203,23 @@ export default function App() {
     localStorage.removeItem('signmirror_progress');
     localStorage.removeItem('signmirror_stats');
     setDataKey(k => k + 1);
+  }
+
+  if (user === undefined) {
+    return (
+      <div className="shell auth-loading" role="status" aria-live="polite">
+        <p>Loading…</p>
+      </div>
+    );
+  }
+
+  if (user === null && !authSkipped && isFirebaseConfigured) {
+    return (
+      <AuthScreen
+        onAuthed={nextUser => { setUser(nextUser); setDataKey(k => k + 1); }}
+        onSkip={handleSkipAuth}
+      />
+    );
   }
 
   if (!settings.onboarded) {
@@ -239,10 +293,12 @@ export default function App() {
         <ProfileScreen
           settings={settings}
           stats={stats}
+          user={user}
           onUpdateSettings={updateSettings}
           onExport={handleExport}
           onImport={handleImport}
           onReset={handleReset}
+          onSignOut={handleSignOut}
         />
       )}
 

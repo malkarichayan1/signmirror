@@ -6,10 +6,12 @@ const GOAL_OPTIONS = [10, 30, 50];
 export default function ProfileScreen({
   settings,
   stats,
+  user,
   onUpdateSettings,
   onExport,
   onImport,
   onReset,
+  onSignOut,
 }) {
   const streak = getStreak(stats);
   const { level, intoLevel, span } = getLevel(stats.totalXp);
@@ -41,6 +43,27 @@ export default function ProfileScreen({
       </div>
 
       <div className="settings-list">
+        {user ? (
+          <div className="settings-row" style={{ cursor: 'default' }}>
+            <span className="settings-row-icon" aria-hidden="true">☁️</span>
+            <span className="grow">
+              <b>Signed in</b>
+              <span>{user.email} · progress synced</span>
+            </span>
+            <button type="button" className="btn-secondary" onClick={onSignOut}>
+              Sign out
+            </button>
+          </div>
+        ) : (
+          <div className="settings-row" style={{ cursor: 'default' }}>
+            <span className="settings-row-icon" aria-hidden="true">👤</span>
+            <span className="grow">
+              <b>Not signed in</b>
+              <span>Progress is only saved on this device</span>
+            </span>
+          </div>
+        )}
+
         <div className="settings-row" style={{ cursor: 'default' }}>
           <span className="settings-row-icon" aria-hidden="true">
             🌙
