@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import SkeletonReplay from './SkeletonReplay.jsx';
 import ExpandableHandPreview from './ExpandableHandPreview.jsx';
+import RevealGroup from './motion/RevealGroup.jsx';
 import { getAllSigns } from '../data/signLoader.js';
 import { MOTION_FPS } from '../config.js';
 import './DictionaryScreen.css';
@@ -36,9 +37,9 @@ export default function DictionaryScreen() {
       {filtered.length === 0 ? (
         <p className="dict-empty">No signs match &ldquo;{query}&rdquo;.</p>
       ) : (
-        <div className="dict-grid">
+        <RevealGroup className="dict-grid" stagger={0.03} as="div">
           {filtered.map((sign) => (
-            <div key={sign.id} className="dict-card">
+            <RevealGroup.Item key={sign.id} as="div" className="dict-card">
               <SkeletonReplay frames={framesFor(sign)} fps={sign.fps ?? MOTION_FPS} size={120} />
               <b className="dict-card-name">{sign.name}</b>
               {sign.description && <p className="dict-card-desc">{sign.description}</p>}
@@ -47,9 +48,9 @@ export default function DictionaryScreen() {
                 fps={sign.fps ?? MOTION_FPS}
                 label={sign.name}
               />
-            </div>
+            </RevealGroup.Item>
           ))}
-        </div>
+        </RevealGroup>
       )}
     </div>
   );

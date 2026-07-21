@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import './Hand3DModal.css';
@@ -182,8 +183,20 @@ export default function Hand3DModal({ frames, fps = 15, onClose, label }) {
   }, [frames, fps, onClose]);
 
   return (
-    <div className="hand3d-overlay" onClick={onClose}>
-      <div className="hand3d-panel" onClick={(e) => e.stopPropagation()}>
+    <motion.div
+      className="hand3d-overlay"
+      onClick={onClose}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.2 }}
+    >
+      <motion.div
+        className="hand3d-panel"
+        onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+      >
         <div className="hand3d-header">
           <span className="hand3d-title">{label ?? 'Hand shape'}</span>
           <button type="button" className="hand3d-close" onClick={onClose} aria-label="Close 3D view">
@@ -197,7 +210,7 @@ export default function Hand3DModal({ frames, fps = 15, onClose, label }) {
         )}
         <div ref={mountRef} className="hand3d-canvas-mount" />
         <p className="hand3d-hint">Drag to rotate · Scroll to zoom · Right-drag to pan</p>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }

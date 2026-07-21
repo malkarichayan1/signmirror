@@ -111,6 +111,7 @@ export default function LessonRunner({ lesson, onComplete }) {
   const [countdownVal,  setCountdownVal]  = useState(null); // 3 | 2 | 1 | null
   const [motionStatus,  setMotionStatus]  = useState('');   // status label
   const [motionCost,    setMotionCost]    = useState(null);
+  const [motionDiag,    setMotionDiag]    = useState(null); // TEMP on-screen diagnostic
 
   // ── Refs (rAF-safe, avoid stale closure issues) ───────────────────────────
   const holdStartRef        = useRef(null);
@@ -296,6 +297,32 @@ export default function LessonRunner({ lesson, onComplete }) {
     const rawFrames = recordingFramesRef.current;
     const trimmed   = trimStationaryFrames(rawFrames, TRIM_EPSILON);
 
+    // ── TEMP DIAGNOSTIC (remove once motion matching is fixed) ──────────────
+    // Set BEFORE the too-short guard so we always see it, even when a
+    // recording is being trimmed away to nothing. Compares the numeric shape
+    // of the user recording vs the reference to locate why real attempts
+    // score far higher than a wrong sign (~0.54).
+    {
+      const ref = refFramesRef.current ?? [];
+      const scale = (lms) => {
+        const w = lms[0], m = lms[9];
+        return Math.hypot(m.x - w.x, m.y - w.y, (m.z ?? 0) - (w.z ?? 0));
+      };
+      const axisMean = (frames) => {
+        let x = 0, y = 0, z = 0, c = 0;
+        for (const f of frames) for (const lm of f) { x += Math.abs(lm.x); y += Math.abs(lm.y); z += Math.abs(lm.z ?? 0); c++; }
+        return c ? { x: +(x / c).toFixed(2), y: +(y / c).toFixed(2), z: +(z / c).toFixed(2) } : { x: 0, y: 0, z: 0 };
+      };
+      const meanScale = (frames) => frames.length ? +(frames.reduce((s, f) => s + scale(f), 0) / frames.length).toFixed(2) : 0;
+      const src = trimmed.length ? trimmed : rawFrames;
+      const um = axisMean(src), rm = axisMean(ref);
+      setMotionDiag(
+        `raw ${rawFrames.length}f → trimmed ${trimmed.length}f · ` +
+        `user scale ${meanScale(src)} |x${um.x} y${um.y} z${um.z}| · ` +
+        `ref ${ref.length}f scale ${meanScale(ref)} |x${rm.x} y${rm.y} z${rm.z}|`
+      );
+    }
+
     if (trimmed.length < 3) {
       setMotionStatus('Recording too short — keep your hand visible');
       motionFailCountRef.current += 1;
@@ -479,6 +506,13 @@ export default function LessonRunner({ lesson, onComplete }) {
                 <p className="motion-sign-desc">{currentSign.description}</p>
               )}
             </div>
+
+            {/* TEMP DIAGNOSTIC — always visible in every motion state */}
+            {motionDiag && (
+              <p className="motion-cost" style={{ fontSize: 11, opacity: 0.85, wordBreak: 'break-word', border: '1px solid var(--rose)', borderRadius: 8, padding: 8 }}>
+                DIAG: {motionDiag}
+              </p>
+            )}
 
             {mode === 'attempting' && (
               <div className="motion-ready-wrap">

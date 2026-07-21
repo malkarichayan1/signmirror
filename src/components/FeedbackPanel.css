@@ -14,7 +14,7 @@
 }
 
 .feedback-panel.fail {
-  border-color: var(--line);
+  border-color: var(--rose);
 }
 
 .feedback-panel.waiting {

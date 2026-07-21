@@ -1,0 +1,452 @@
+/* ── Landing page — always-dark, self-contained token block ──────────────
+   Deliberately does NOT read the app's --ground/--card/--ink tokens: the
+   marketing page has its own fixed dark palette regardless of the user's
+   light/dark app preference. Scoped entirely under .landing-page so it
+   never leaks into the app shell. */
+.landing-page {
+  --lp-bg: #0a0a0b;
+  --lp-bg-2: #131316;
+  --lp-card: #18181b;
+  --lp-line: #27272a;
+  --lp-fg: #f4f4f5;
+  --lp-fg-2: #a1a1aa;
+  --lp-fg-3: #71717a;
+  --lp-indigo: #818cf8;
+  --lp-emerald: #34d399;
+  --lp-radius: 20px;
+
+  background: var(--lp-bg);
+  color: var(--lp-fg);
+  font-family: 'Inter', 'Inter Tight', system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+.landing-page * {
+  box-sizing: border-box;
+}
+
+.landing-container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.landing-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--lp-emerald);
+  margin-bottom: 16px;
+}
+
+.landing-h1 {
+  font-family: 'Inter Tight', 'Inter', sans-serif;
+  font-size: clamp(2.5rem, 2rem + 3vw, 4.5rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin: 0 0 20px;
+}
+
+.landing-h2 {
+  font-family: 'Inter Tight', 'Inter', sans-serif;
+  font-size: clamp(1.75rem, 1.4rem + 1.6vw, 2.75rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0 0 14px;
+}
+
+.landing-lede {
+  font-size: clamp(1.05rem, 1rem + 0.4vw, 1.3rem);
+  color: var(--lp-fg-2);
+  max-width: 56ch;
+  line-height: 1.5;
+}
+
+.landing-section {
+  padding: clamp(64px, 8vw, 128px) 0;
+}
+
+.landing-section-head {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 48px;
+}
+
+.landing-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 32px;
+}
+
+.landing-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 26px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.landing-btn.primary {
+  background: linear-gradient(135deg, var(--lp-indigo), var(--lp-emerald));
+  color: #0a0a0b;
+  box-shadow: 0 8px 30px rgba(99, 102, 241, 0.35);
+}
+
+.landing-btn.primary:hover {
+  box-shadow: 0 10px 36px rgba(99, 102, 241, 0.5);
+}
+
+.landing-btn.ghost {
+  background: transparent;
+  color: var(--lp-fg);
+  border-color: var(--lp-line);
+}
+
+.landing-btn.ghost:hover {
+  border-color: var(--lp-fg-3);
+}
+
+/* ── Nav ───────────────────────────────────────────────────────────────── */
+.landing-nav {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  backdrop-filter: blur(12px);
+  background: rgba(10, 10, 11, 0.72);
+  border-bottom: 1px solid var(--lp-line);
+}
+
+.landing-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+  color: var(--lp-fg);
+}
+
+.landing-nav-links {
+  display: none;
+  gap: 28px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--lp-fg-2);
+}
+
+.landing-nav-links a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.landing-nav-links a:hover {
+  color: var(--lp-fg);
+}
+
+@media (min-width: 720px) {
+  .landing-nav-links {
+    display: flex;
+  }
+}
+
+/* ── Hero ──────────────────────────────────────────────────────────────── */
+.landing-hero {
+  padding: clamp(72px, 12vw, 140px) 0 clamp(48px, 6vw, 80px);
+  text-align: center;
+}
+
+.landing-hero .landing-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.landing-hero .landing-lede {
+  margin: 0 auto;
+}
+
+.landing-hero .landing-cta-row {
+  justify-content: center;
+}
+
+/* ── Ghost demo scrub ──────────────────────────────────────────────────── */
+.ghost-scrub {
+  position: relative;
+  height: 300vh;
+}
+
+.ghost-scrub-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  overflow: hidden;
+}
+
+.ghost-scrub-frame {
+  position: relative;
+  width: min(520px, 82vw);
+  aspect-ratio: 4 / 3;
+  border-radius: 28px;
+  background: var(--lp-bg-2);
+  border: 1px solid var(--lp-line);
+  overflow: hidden;
+}
+
+.ghost-scrub-caption {
+  font-size: clamp(1.1rem, 1rem + 0.6vw, 1.5rem);
+  font-weight: 700;
+  color: var(--lp-fg-2);
+  text-align: center;
+  max-width: 34ch;
+}
+
+.ghost-scrub-caption b {
+  color: var(--lp-fg);
+}
+
+/* ── How it works ─────────────────────────────────────────────────────── */
+.how-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.how-card {
+  background: var(--lp-card);
+  border: 1px solid var(--lp-line);
+  border-radius: var(--lp-radius);
+  padding: 28px 24px;
+}
+
+.how-card-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  background: rgba(52, 211, 153, 0.15);
+  color: var(--lp-emerald);
+  font-weight: 800;
+  font-size: 15px;
+  margin-bottom: 16px;
+}
+
+.how-card h3 {
+  font-size: 17px;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.how-card p {
+  font-size: 14.5px;
+  color: var(--lp-fg-2);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ── Privacy strip ────────────────────────────────────────────────────── */
+.privacy-strip {
+  background: var(--lp-bg-2);
+  border-top: 1px solid var(--lp-line);
+  border-bottom: 1px solid var(--lp-line);
+}
+
+.privacy-strip .landing-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.privacy-icon {
+  font-size: 32px;
+  flex-shrink: 0;
+}
+
+.privacy-strip h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.privacy-strip p {
+  font-size: 14px;
+  color: var(--lp-fg-2);
+  margin: 0;
+  max-width: 60ch;
+}
+
+/* ── Feature bento ─────────────────────────────────────────────────────── */
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: minmax(160px, auto);
+  gap: 16px;
+}
+
+.bento-card {
+  background: var(--lp-card);
+  border: 1px solid var(--lp-line);
+  border-radius: var(--lp-radius);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 6px;
+  grid-column: span 4;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.bento-card:hover {
+  border-color: var(--lp-fg-3);
+  transform: translateY(-2px);
+}
+
+.bento-card.span-2 {
+  grid-column: span 4;
+}
+
+.bento-icon {
+  font-size: 26px;
+  margin-bottom: 8px;
+}
+
+.bento-card h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.bento-card p {
+  font-size: 13.5px;
+  color: var(--lp-fg-2);
+  margin: 0;
+  line-height: 1.45;
+}
+
+@media (min-width: 640px) {
+  .bento-card {
+    grid-column: span 2;
+  }
+  .bento-card.span-2 {
+    grid-column: span 2;
+  }
+}
+
+@media (min-width: 960px) {
+  .bento-card.span-2 {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+}
+
+/* ── Comparison strip ─────────────────────────────────────────────────── */
+.comparison-strip {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 720px) {
+  .comparison-strip {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.comparison-col {
+  border-radius: var(--lp-radius);
+  padding: 28px 26px;
+  border: 1px solid var(--lp-line);
+}
+
+.comparison-col.them {
+  background: var(--lp-bg-2);
+  opacity: 0.75;
+}
+
+.comparison-col.us {
+  background: linear-gradient(160deg, rgba(99, 102, 241, 0.12), rgba(52, 211, 153, 0.08));
+  border-color: rgba(129, 140, 248, 0.4);
+}
+
+.comparison-col h3 {
+  font-size: 15px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin: 0 0 18px;
+  color: var(--lp-fg-2);
+}
+
+.comparison-col.us h3 {
+  color: var(--lp-emerald);
+}
+
+.comparison-col ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 14.5px;
+}
+
+.comparison-col li {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  color: var(--lp-fg-2);
+}
+
+.comparison-col.us li {
+  color: var(--lp-fg);
+}
+
+/* ── Final CTA ─────────────────────────────────────────────────────────── */
+.final-cta {
+  text-align: center;
+}
+
+.final-cta .landing-cta-row {
+  justify-content: center;
+}
+
+/* ── Footer ────────────────────────────────────────────────────────────── */
+.landing-footer {
+  border-top: 1px solid var(--lp-line);
+  padding: 32px 0;
+}
+
+.landing-footer .landing-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--lp-fg-3);
+}

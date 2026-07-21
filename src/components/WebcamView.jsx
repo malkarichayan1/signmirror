@@ -1,22 +1,14 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { initHandTracking, startDetectionLoop, stopDetectionLoop } from '../lib/handTracking.js';
 import { normalizeLandmarks } from '../lib/normalize.js';
+import { HAND_CONNECTIONS as CONNECTIONS } from '../lib/handSkeleton.js';
 import './WebcamView.css';
-
-const CONNECTIONS = [
-  [0,1],[1,2],[2,3],[3,4],
-  [0,5],[5,6],[6,7],[7,8],
-  [0,9],[9,10],[10,11],[11,12],
-  [0,13],[13,14],[14,15],[15,16],
-  [0,17],[17,18],[18,19],[19,20],
-  [5,9],[9,13],[13,17],
-];
 
 function drawHand(ctx, landmarkSets, w, h) {
   ctx.clearRect(0, 0, w, h);
   if (!landmarkSets || landmarkSets.length === 0) return;
   const lms = landmarkSets[0];
-  ctx.strokeStyle = '#22d3ee';
+  ctx.strokeStyle = '#4f46e5';
   ctx.lineWidth = 2.5;
   for (const [a, b] of CONNECTIONS) {
     ctx.beginPath();
@@ -34,7 +26,7 @@ function drawHand(ctx, landmarkSets, w, h) {
 
 const WRIST_IDX = 0;
 const MIDDLE_MCP_IDX = 9;
-const GHOST_COLOR = 'rgba(245, 158, 11, 0.65)'; // amber, semi-transparent
+const GHOST_COLOR = 'rgba(34, 197, 94, 0.65)'; // emerald, semi-transparent
 
 // Reference landmarks are stored wrist-origin + scale-normalized (see
 // normalize.js). To overlay them as a "ghost" guide on the live feed, undo

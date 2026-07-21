@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import HomeScreen from './components/HomeScreen.jsx';
 import ExploreScreen from './components/ExploreScreen.jsx';
 import PracticeScreen from './components/PracticeScreen.jsx';
@@ -10,6 +11,7 @@ import AuthScreen from './components/AuthScreen.jsx';
 import LessonRunner from './components/LessonRunner.jsx';
 import FingerspellingRunner from './components/FingerspellingRunner.jsx';
 import DictionaryScreen from './components/DictionaryScreen.jsx';
+import Landing from './components/Landing/Landing.jsx';
 import {
   loadProgress,
   isLessonUnlocked,
@@ -26,6 +28,7 @@ import LESSONS_MANIFEST from './data/lessons.json';
 import './App.css';
 
 const AUTH_SKIPPED_KEY = 'signmirror_auth_skipped';
+const ENTERED_APP_KEY = 'signmirror_entered_app';
 
 // Resolve sign ID strings in the manifest to full sign data objects.
 const LESSONS = LESSONS_MANIFEST.map(lesson => ({
@@ -98,6 +101,9 @@ const NAV_ITEMS = [
 ];
 
 export default function App() {
+  const [hasEnteredApp, setHasEnteredApp] = useState(
+    () => localStorage.getItem(ENTERED_APP_KEY) === 'true'
+  );
   const [tab, setTab] = useState('learn');
   const [runningLesson, setRunningLesson] = useState(null);
   const [fingerspellingOpen, setFingerspellingOpen] = useState(false);
@@ -214,6 +220,17 @@ export default function App() {
     setDataKey(k => k + 1);
   }
 
+  if (!hasEnteredApp) {
+    return (
+      <Landing
+        onEnter={() => {
+          localStorage.setItem(ENTERED_APP_KEY, 'true');
+          setHasEnteredApp(true);
+        }}
+      />
+    );
+  }
+
   if (user === undefined) {
     return (
       <div className="shell auth-loading" role="status" aria-live="polite">
@@ -290,60 +307,70 @@ export default function App() {
 
   return (
     <div className="shell">
-      {tab === 'learn' && (
-        <HomeScreen
-          name={settings.name}
-          lessons={LESSONS}
-          progress={progress}
-          stats={stats}
-          dailyGoalXp={settings.dailyGoalXp}
-          mistakeCount={mistakeSigns.length}
-          onStartLesson={startLesson}
-          onPracticeMistakes={startMistakePractice}
-          onExplore={() => setTab('explore')}
-        />
-      )}
-      {tab === 'practice' && (
-        <PracticeScreen
-          continueLesson={continueLesson}
-          completedLessons={completedLessons}
-          mistakeCount={mistakeSigns.length}
-          onStartLesson={startLesson}
-          onPracticeMistakes={startMistakePractice}
-          onOpenFingerspelling={() => setFingerspellingOpen(true)}
-        />
-      )}
-      {tab === 'explore' && (
-        <ExploreScreen
-          lessons={LESSONS}
-          progress={progress}
-          onStartLesson={startLesson}
-          onOpenDictionary={() => setDictionaryOpen(true)}
-        />
-      )}
-      {tab === 'progress' && (
-        <ProgressScreen lessons={LESSONS} progress={progress} stats={stats} />
-      )}
-      {tab === 'mastery' && (
-        <MasteryScreen
-          lessons={LESSONS}
-          progress={progress}
-          onAttemptRecorded={() => setDataKey(k => k + 1)}
-          onDone={() => setTab('learn')}
-        />
-      )}
-      {tab === 'profile' && (
-        <ProfileScreen
-          settings={settings}
-          stats={stats}
-          user={user}
-          onUpdateSettings={updateSettings}
-          onExport={handleExport}
-          onImport={handleImport}
-          onReset={handleReset}
-          onSignOut={handleSignOut}
-        />
-      )}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={tab}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+        >
+          {tab === 'learn' && (
+            <HomeScreen
+              name={settings.name}
+              lessons={LESSONS}
+              progress={progress}
+              stats={stats}
+              dailyGoalXp={settings.dailyGoalXp}
+              mistakeCount={mistakeSigns.length}
+              onStartLesson={startLesson}
+              onPracticeMistakes={startMistakePractice}
+              onExplore={() => setTab('explore')}
+            />
+          )}
+          {tab === 'practice' && (
+            <PracticeScreen
+              continueLesson={continueLesson}
+              completedLessons={completedLessons}
+              mistakeCount={mistakeSigns.length}
+              onStartLesson={startLesson}
+              onPracticeMistakes={startMistakePractice}
+              onOpenFingerspelling={() => setFingerspellingOpen(true)}
+            />
+          )}
+          {tab === 'explore' && (
+            <ExploreScreen
+              lessons={LESSONS}
+              progress={progress}
+              onStartLesson={startLesson}
+              onOpenDictionary={() => setDictionaryOpen(true)}
+            />
+          )}
+          {tab === 'progress' && (
+            <ProgressScreen lessons={LESSONS} progress={progress} stats={stats} />
+          )}
+          {tab === 'mastery' && (
+            <MasteryScreen
+              lessons={LESSONS}
+              progress={progress}
+              onAttemptRecorded={() => setDataKey(k => k + 1)}
+              onDone={() => setTab('learn')}
+            />
+          )}
+          {tab === 'profile' && (
+            <ProfileScreen
+              settings={settings}
+              stats={stats}
+              user={user}
+              onUpdateSettings={updateSettings}
+              onExport={handleExport}
+              onImport={handleImport}
+              onReset={handleReset}
+              onSignOut={handleSignOut}
+            />
+          )}
+        </motion.div>
+      </AnimatePresence>
 
       <nav className="bottom-nav" aria-label="Main navigation">
         {NAV_ITEMS.map(item => (
@@ -353,8 +380,11 @@ export default function App() {
             aria-current={tab === item.id ? 'page' : undefined}
             onClick={() => setTab(item.id)}
           >
+            {tab === item.id && (
+              <motion.span className="tab-pill" layoutId="tab-pill" transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }} />
+            )}
             {item.icon}
-            {item.label}
+            <span>{item.label}</span>
           </button>
         ))}
       </nav>

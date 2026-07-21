@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import {
   getStreak,
   getAccuracy,
@@ -5,6 +6,7 @@ import {
   getRecentDays,
   dayKey,
 } from '../lib/stats.js';
+import RevealGroup from './motion/RevealGroup.jsx';
 import './TabScreens.css';
 
 function countSignsLearned(progress) {
@@ -53,24 +55,24 @@ export default function ProgressScreen({ lessons, progress, stats }) {
       <h2 className="tab-title">Progress</h2>
       <p className="tab-sub">Everything you&rsquo;ve earned so far.</p>
 
-      <div className="stat-grid">
-        <div className="card stat-tile">
+      <RevealGroup className="stat-grid">
+        <RevealGroup.Item as="div" className="card stat-tile">
           <b className="num">{stats.totalXp}</b>
           <span>Total XP</span>
-        </div>
-        <div className="card stat-tile">
+        </RevealGroup.Item>
+        <RevealGroup.Item as="div" className="card stat-tile">
           <b className="num">{level}</b>
           <span>Level</span>
-        </div>
-        <div className="card stat-tile">
+        </RevealGroup.Item>
+        <RevealGroup.Item as="div" className="card stat-tile">
           <b className="num">{signsLearned}</b>
           <span>Signs learned</span>
-        </div>
-        <div className="card stat-tile">
+        </RevealGroup.Item>
+        <RevealGroup.Item as="div" className="card stat-tile">
           <b className="num">{accuracy === null ? '—' : `${Math.round(accuracy * 100)}%`}</b>
           <span>Accuracy</span>
-        </div>
-      </div>
+        </RevealGroup.Item>
+      </RevealGroup>
 
       <div className="card">
         <span className="eyebrow">Level {level}</span>
@@ -80,7 +82,11 @@ export default function ProgressScreen({ lessons, progress, stats }) {
             <span>{span} XP to level {level + 1}</span>
           </div>
           <div className="xp-next-track">
-            <i style={{ width: `${(intoLevel / span) * 100}%` }} />
+            <motion.i
+              initial={{ width: 0 }}
+              animate={{ width: `${(intoLevel / span) * 100}%` }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            />
           </div>
         </div>
       </div>
@@ -90,11 +96,15 @@ export default function ProgressScreen({ lessons, progress, stats }) {
       </div>
       <div className="card">
         <div className="xp-bars" role="img" aria-label="XP earned per day this week">
-          {week.map(d => (
-            <i
+          {week.map((d, i) => (
+            <motion.i
               key={d.key}
               className={d.xp > 0 ? 'lit' : ''}
-              style={{ height: `${Math.max((d.xp / weekMax) * 100, 5)}%` }}
+              style={{ height: `${Math.max((d.xp / weekMax) * 100, 5)}%`, transformOrigin: 'bottom' }}
+              initial={{ scaleY: 0 }}
+              whileInView={{ scaleY: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: i * 0.05, ease: [0.16, 1, 0.3, 1] }}
               title={`${d.xp} XP`}
             />
           ))}
@@ -111,20 +121,27 @@ export default function ProgressScreen({ lessons, progress, stats }) {
         <span className="pill pill-amber num">🔥 {streak} days</span>
       </div>
       <div className="card">
-        <div className="cal-grid" role="img" aria-label="Practice days over the last four weeks">
+        <RevealGroup
+          className="cal-grid"
+          stagger={0.015}
+          as="div"
+          role="img"
+          aria-label="Practice days over the last four weeks"
+        >
           {month.map(d => {
             const lit = d.xp > 0;
             const isToday = d.key === todayKey;
             return (
-              <i
+              <RevealGroup.Item
                 key={d.key}
+                as="i"
                 className={`cal-day ${lit ? 'lit' : ''} ${isToday ? 'today' : ''}`}
               >
                 {lit ? '🔥' : ''}
-              </i>
+              </RevealGroup.Item>
             );
           })}
-        </div>
+        </RevealGroup>
       </div>
 
       <div className="section-head">
@@ -133,17 +150,17 @@ export default function ProgressScreen({ lessons, progress, stats }) {
           {earnedCount}/{badges.length}
         </span>
       </div>
-      <div className="badge-grid">
+      <RevealGroup className="badge-grid" stagger={0.04} as="div">
         {badges.map(badge => (
-          <div key={badge.id} className={`badge ${badge.earned ? '' : 'locked'}`}>
+          <RevealGroup.Item key={badge.id} as="div" className={`badge ${badge.earned ? '' : 'locked'}`}>
             <span className="badge-medal" aria-hidden="true">
               {badge.emoji}
             </span>
             <b>{badge.title}</b>
             <span>{badge.desc}</span>
-          </div>
+          </RevealGroup.Item>
         ))}
-      </div>
+      </RevealGroup>
     </div>
   );
 }

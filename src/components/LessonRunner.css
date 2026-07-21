@@ -20,7 +20,7 @@
   display: block;
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--indigo), var(--cyan));
+  background: linear-gradient(90deg, var(--indigo), var(--emerald));
   transition: width var(--dur-slow) var(--ease-out);
 }
 
@@ -187,7 +187,7 @@
   place-items: center;
   font-size: 48px;
   line-height: 1;
-  background: linear-gradient(135deg, var(--emerald-soft), var(--cyan-soft));
+  background: linear-gradient(135deg, var(--emerald-soft), var(--indigo-soft));
   box-shadow: var(--sh-1);
   animation: badge-pop var(--dur-slow) var(--ease-spring);
 }

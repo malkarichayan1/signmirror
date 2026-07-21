@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import { getStreak, getLevel } from '../lib/stats.js';
 import './TabScreens.css';
 
@@ -128,7 +129,7 @@ export default function ProfileScreen({
       </div>
 
       <div className="settings-list">
-        <button className="settings-row" onClick={onExport}>
+        <motion.button whileTap={{ scale: 0.98 }} className="settings-row" onClick={onExport}>
           <span className="settings-row-icon" aria-hidden="true">
             ⬇️
           </span>
@@ -136,8 +137,8 @@ export default function ProfileScreen({
             <b>Export progress</b>
             <span>Download a backup file</span>
           </span>
-        </button>
-        <button className="settings-row" onClick={onImport}>
+        </motion.button>
+        <motion.button whileTap={{ scale: 0.98 }} className="settings-row" onClick={onImport}>
           <span className="settings-row-icon" aria-hidden="true">
             ⬆️
           </span>
@@ -145,8 +146,8 @@ export default function ProfileScreen({
             <b>Import progress</b>
             <span>Restore from a backup</span>
           </span>
-        </button>
-        <button className="settings-row" onClick={onReset}>
+        </motion.button>
+        <motion.button whileTap={{ scale: 0.98 }} className="settings-row" onClick={onReset}>
           <span
             className="settings-row-icon"
             style={{ background: 'var(--rose-soft)' }}
@@ -158,7 +159,7 @@ export default function ProfileScreen({
             <b style={{ color: 'var(--rose)' }}>Reset everything</b>
             <span>Erase progress, XP and streaks</span>
           </span>
-        </button>
+        </motion.button>
       </div>
     </div>
   );

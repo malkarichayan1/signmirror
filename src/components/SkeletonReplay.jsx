@@ -59,6 +59,17 @@ function computeBounds(frames) {
   return { minX: minX - padX, maxX: maxX + padX, minY: minY - padY, maxY: maxY + padY };
 }
 
+// Linear interpolation between two same-shaped landmark frames — mirrors
+// Hand3DModal's lerpFrames so sparse recordings (some signs have as few as
+// 5-9 captured frames) play back as continuous motion instead of snapping
+// hard from pose to pose every 1000/fps ms.
+function lerpFrames(a, b, t) {
+  return a.map((lm, i) => ({
+    x: lm.x + (b[i].x - lm.x) * t,
+    y: lm.y + (b[i].y - lm.y) * t,
+  }));
+}
+
 export default function SkeletonReplay({ frames, fps = 15, size = 200 }) {
   const canvasRef = useRef(null);
   const rafRef    = useRef(null);
@@ -81,10 +92,6 @@ export default function SkeletonReplay({ frames, fps = 15, size = 200 }) {
       y: offY + (lm.y - bounds.minY) * scale,
     });
 
-    const interval = 1000 / fps;
-    let frameIdx = 0;
-    let lastTime = 0;
-
     function drawFrame(lms) {
       ctx.clearRect(0, 0, size, size);
       const pts = lms.map(toCanvas);
@@ -106,12 +113,22 @@ export default function SkeletonReplay({ frames, fps = 15, size = 200 }) {
       }
     }
 
+    if (frames.length === 1) {
+      drawFrame(frames[0]);
+      return;
+    }
+
+    const cycleDurationMs = (frames.length / fps) * 1000;
+    let cycleStart = null;
+
     function tick(now) {
-      if (now - lastTime >= interval) {
-        drawFrame(frames[frameIdx]);
-        frameIdx = (frameIdx + 1) % frames.length;
-        lastTime = now;
-      }
+      if (cycleStart === null) cycleStart = now;
+      const elapsed = (now - cycleStart) % cycleDurationMs;
+      const virtualIdx = (elapsed / cycleDurationMs) * frames.length;
+      const i = Math.floor(virtualIdx) % frames.length;
+      const j = (i + 1) % frames.length;
+      const t = virtualIdx - Math.floor(virtualIdx);
+      drawFrame(lerpFrames(frames[i], frames[j], t));
       rafRef.current = requestAnimationFrame(tick);
     }
 

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import './TabScreens.css';
 
-const COLORS = ['#4f46e5', '#22c55e', '#06b6d4', '#f59e0b', '#f43f5e'];
+const COLORS = ['#4f46e5', '#22c55e', '#6366f1', '#f59e0b', '#f43f5e'];
 const PIECE_COUNT = 60;
 
 // Celebratory confetti burst. Purely decorative; respects reduced motion

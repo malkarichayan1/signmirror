@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import { MATCH_THRESHOLD } from '../config.js';
 import './FeedbackPanel.css';
 
@@ -10,7 +11,13 @@ export default function FeedbackPanel({ distance, pass }) {
     : 0;
 
   return (
-    <div className={`feedback-panel ${!hasData ? 'waiting' : pass ? 'pass' : 'fail'}`}>
+    <motion.div
+      key={pass ? 'pass' : 'not-pass'}
+      className={`feedback-panel ${!hasData ? 'waiting' : pass ? 'pass' : 'fail'}`}
+      initial={pass ? { scale: 0.97 } : false}
+      animate={{ scale: 1 }}
+      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+    >
       {!hasData ? (
         <p className="feedback-hint">Show your hand to the camera</p>
       ) : (
@@ -29,6 +36,6 @@ export default function FeedbackPanel({ distance, pass }) {
           </div>
         </>
       )}
-    </div>
+    </motion.div>
   );
 }

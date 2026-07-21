@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import WebcamView from './WebcamView.jsx';
 import FeedbackPanel from './FeedbackPanel.jsx';
 import ExpandableHandPreview from './ExpandableHandPreview.jsx';
@@ -74,14 +75,20 @@ export default function FingerspellingRunner({ onExit }) {
   return (
     <div className="lesson-runner-wrap">
       <div className="fs-word-row" aria-label={`Spelling ${word}`}>
-        {letters.map((ch, i) => (
-          <span
-            key={i}
-            className={`fs-letter-tile ${i < letterIdx ? 'done' : i === letterIdx ? 'current' : 'pending'}`}
-          >
-            {ch.toUpperCase()}
-          </span>
-        ))}
+        {letters.map((ch, i) => {
+          const state = i < letterIdx ? 'done' : i === letterIdx ? 'current' : 'pending';
+          return (
+            <motion.span
+              key={`${i}-${state}`}
+              className={`fs-letter-tile ${state}`}
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+            >
+              {ch.toUpperCase()}
+            </motion.span>
+          );
+        })}
       </div>
 
       <div className="lesson-runner">

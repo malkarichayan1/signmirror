@@ -58,7 +58,7 @@
   display: grid;
   place-items: center;
   font-size: 44px;
-  background: linear-gradient(135deg, var(--indigo-soft), var(--cyan-soft));
+  background: linear-gradient(135deg, var(--indigo-soft), var(--emerald-soft));
   box-shadow: var(--sh-1);
 }
 

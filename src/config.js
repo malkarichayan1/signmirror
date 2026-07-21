@@ -24,9 +24,14 @@ export const MODEL_URL =
 
 // ── Motion / DTW constants ─────────────────────────────────────────────────
 
-// Sakoe-Chiba band width = ceil(maxSeqLen * DTW_BAND_RATIO).
-// Wider band = more flexible tempo matching but slower.
-export const DTW_BAND_RATIO = 0.2;
+// Sakoe-Chiba band width = max(ceil(maxSeqLen * DTW_BAND_RATIO), |userLen - refLen|).
+// Wider band = more flexible tempo matching but slower. The |userLen - refLen|
+// floor (see sequenceMatcher.js) guarantees the match is always mathematically
+// reachable; this ratio governs extra flexibility for pacing that varies
+// *within* the gesture, not just overall length. Widened from 0.2 after
+// real motion attempts were failing outright — a single reference recording
+// is a poor stand-in for how differently every learner paces the same sign.
+export const DTW_BAND_RATIO = 0.35;
 
 // Normalized DTW cost below which a motion attempt counts as a pass.
 // Lower = stricter. Start at 0.40 and adjust after calibration.

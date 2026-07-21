@@ -21,7 +21,7 @@ button {
 }
 
 :focus-visible {
-  outline: 3px solid var(--cyan);
+  outline: 3px solid var(--indigo);
   outline-offset: 2px;
   border-radius: 6px;
 }
@@ -80,6 +80,7 @@ button {
 }
 
 .nav-item {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -99,9 +100,16 @@ button {
 }
 
 .nav-item svg {
+  position: relative;
+  z-index: 1;
   width: 22px;
   height: 22px;
   transition: transform var(--dur-base) var(--ease-spring);
+}
+
+.nav-item span {
+  position: relative;
+  z-index: 1;
 }
 
 .nav-item:hover {
@@ -110,7 +118,14 @@ button {
 
 .nav-item.active {
   color: var(--indigo);
+}
+
+.tab-pill {
+  position: absolute;
+  inset: 0;
   background: var(--indigo-soft);
+  border-radius: var(--r-lg);
+  z-index: 0;
 }
 
 .nav-item.active svg {
@@ -179,7 +194,7 @@ button {
   display: block;
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, var(--indigo), var(--cyan));
+  background: linear-gradient(90deg, var(--indigo), var(--emerald));
   transition: width var(--dur-slow) var(--ease-out);
 }
 
@@ -280,11 +295,6 @@ button {
 .pill-indigo {
   background: var(--indigo-soft);
   color: var(--indigo);
-}
-
-.pill-cyan {
-  background: var(--cyan-soft);
-  color: var(--cyan-deep);
 }
 
 .eyebrow {

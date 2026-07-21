@@ -16,6 +16,14 @@ function frameDist(a, b) {
   return sum / a.length;
 }
 
+// Reference clips aren't consistently one-handed, and a signer's dominant
+// hand produces a landmark set mirrored across x relative to the opposite
+// hand's — same reasoning as matcher.js's static mirrorX, applied per-frame
+// here so a whole mirrored sequence can be compared as one candidate.
+function mirrorSequenceX(frames) {
+  return frames.map((frame) => frame.map((lm) => ({ x: -lm.x, y: lm.y, z: lm.z })));
+}
+
 // Dynamic Time Warping with a Sakoe-Chiba band.
 // Returns the path-normalized cost (total accumulated cost / path length).
 // seq1, seq2 – arrays of normalized 21-landmark frames
@@ -92,7 +100,17 @@ export function matchSequence(userFrames, refFrames, { bandRatio = 0.2, threshol
   if (!userFrames?.length || !refFrames?.length) {
     return { cost: Infinity, pass: false };
   }
-  const band = Math.ceil(Math.max(userFrames.length, refFrames.length) * bandRatio);
-  const cost = dtw(userFrames, refFrames, band);
+  const n = userFrames.length;
+  const m = refFrames.length;
+  // The Sakoe-Chiba band must be at least |n - m|, or the DTW path can
+  // never reach the final cell (it stays Infinity, an unconditional fail
+  // regardless of how well-matched the motion actually was). A user signing
+  // even moderately slower/faster than the single reference recording — or
+  // trimStationaryFrames leaving a different-length active segment — easily
+  // produces a length gap bigger than a plain ratio-of-max would allow.
+  const band = Math.max(Math.ceil(Math.max(n, m) * bandRatio), Math.abs(n - m));
+  const direct = dtw(userFrames, refFrames, band);
+  const mirrored = dtw(userFrames, mirrorSequenceX(refFrames), band);
+  const cost = Math.min(direct, mirrored);
   return { cost, pass: cost < threshold };
 }
